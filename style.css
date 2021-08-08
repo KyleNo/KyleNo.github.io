@@ -422,6 +422,20 @@ h3{
     background-color: #d0f5f5;
     color
 }
+.demo-icons .fab{
+    color: #31f5f5;
+    margin: 0 13px;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 30px;
+    transition: 0.75s;
+    border-radius: 10px;
+}
+.demo-icons .fab:hover{
+    background-color: #31f5f5;
+    color: #fff;
+    transition 0.75s;
+}
 
 /* About Page */
 .about-header{
@@ -446,4 +460,18 @@ h3{
     padding-top: 100px;
     padding-bottom: 100px;
     text-align: justify;
+}
+.about-icons .fab{
+    color: #31f552;
+    margin: 0 13px;
+    cursor: pointer;
+    padding: 5px;
+    font-size: 30px;
+    transition: 0.75s;
+    border-radius: 10px;
+}
+.about-icons .fab:hover{
+    background-color: #31f552;
+    color: #fff;
+    transition 0.75s;
 }
