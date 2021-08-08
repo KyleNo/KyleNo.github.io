@@ -1,8 +1,126 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
+        <base href=".">
+        <meta name="viewport" content="with=device-width, initial-scale=1.0" charset="utf-8">
+        <title>Kyle's Kove</title>
         <link rel="stylesheet" href="style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=MonteCarlo&display=swap" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/6d6b6b0664.js" crossorigin="anonymous"></script>
     </head>
-    <title>Kyle Noble</title>
-    <h1>Website Under Construction</h1>
+    <body>
+        <section class="header">
+            <nav>
+                <a href="index.html">Kyle Noble</a>
+                <div class="nav-links" id="navLinks">
+                    <i class="far fa-times-circle" onclick="hideMenu()"></i>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="projects.html">Projects</a></li>
+                        <li><a href="demos.html">Demos</a></li>
+                        <li><a href="about.html">About Me</a></li>
+                    </ul>
+                </div>
+                <i class="fas fa-bars" onclick="showMenu()"></i>
+            </nav>
+            <div class="home-text">
+                <h1>Kyle's Kove</h1>
+                <p>A personal website to showcase some projects and online demos that I've worked on and created.
+                </p>
+            </div>
+        </section>
+        
+        <!--- Projects --->
+        
+        <section class="project">
+            <div class="pro-desc">
+                <h1>Projects</h1>
+                <p>See some of the projects that I have worked on.
+                Some of these are part of my college curriculum,
+                and some of these are personal or extracurricular projects.
+                </p>
+                <a href="projects.html" class="pro-btn">View Projects</a>
+                <div class="row">
+                    <div class="pro-col" onclick="location.href='projects.html#qi';">
+                        <h3>Qi Wireless Charger</h3>
+                        <img src="images/qi_mount.jpg" alt="Mounted wireless charging PCB" width=100%>
+                        <p>A wireless charging system which utilizes WPC Qi compliant ICs to charge small unmanned ground vehicles.
+                        </p>
+                    </div>
+                    <div class="pro-col" onclick="location.href='projects.html#robotarm';">
+                        <h3>2-Axis Robotic Arm</h3>
+                        <img src="images/robotarm_cv.jpg" alt="Robotic Arm with computer vision demonstration" width=100%>
+                        <p>A 3D printed robotic arm (SCARA) with a pen attachment which attempts to replicate images using OpenCV.
+                        </p>
+                    </div>
+                    <div class="pro-col" onclick="location.href='projects.html#smallsh';">
+                        <h3>smallsh</h3>
+                        <img src="images/smallsh.png" alt="A Linux shell interpreting a few commands." width=100%>
+                        <p>A simple, barebones Linux shell which supports input/output redirection and background processes.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!---  Demos   --->
+        
+        <section class="demo">
+            <div class="demo-desc">
+                <h1>Demos</h1>
+                <p>Here are a few online demonstrations that I have created. Many of these are related to topics that I've learned about in various classes.</p>
+                <a href="demos.html" class="demo-btn">View Demos</a>
+                <div class="row">
+                    <div class="demo-col" onclick="location.href='';">
+                        <h3>Under Construction</h3>
+                        <img src="images/construction.jpg" alt="Under Construction" width=100%>
+                        <p>This demo is currently under construction. (This is just a placeholder.)
+                        </p>
+                    </div>
+                    <div class="demo-col" onclick="location.href='';">
+                        <h3>Work in Progress</h3>
+                        <img src="images/wip.jpg" alt="Work in Progress" width=100%>
+                        <p>This demo is currently a work in progress. (This is just a placeholder.)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!--- About Me --->
+        
+        <section class="demo">
+            <div class="demo-desc">
+                <h1>About Me</h1>
+                <p>I'm Kyle Noble. I graduated Oregon State University in June 2021 with a Bachelor's Degree in Electrical and Computer Engineering and a minor in Computer Science. I enjoy problem solving, challenging myself, and learning.</p>
+                <a href="about.html" class="demo-btn">See More</a>
+            </div>
+        </section>
+        
+        <!---  Footer  --->
+        
+        <section class="footer">
+            <h4>Contact</h4>
+            <p>Contact information can be found linked below.</p>
+            <div class="icons">
+                <a href="https://www.linkedin.com/in/kyle-n-noble/"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://github.com/KyleNo"><i class="fab fa-github"></i></a>
+            </div>
+            <p>Website created by Kyle Noble.</p>
+        </section>
+        
+        <!--- JavaScript for Mobile Menu Toggle --->
+        <script>
+            var navLinks = document.getElementById("navLinks");
+            
+            function showMenu(){
+                navLinks.style.right = "0";
+            }
+            function hideMenu(){
+                navLinks.style.right = "-200px";
+            }
+        </script>
+    </body>
 </html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <base href=".">
+        <meta name="viewport" content="with=device-width, initial-scale=1.0" charset="utf-8">
+        <title>Projects</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=MonteCarlo&display=swap" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/6d6b6b0664.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <section class="pro-header">
+            <nav>
+                <a href="index.html">Kyle Noble</a>
+                <div class="nav-links" id="navLinks">
+                    <i class="far fa-times-circle" onclick="hideMenu()"></i>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="projects.html">Projects</a></li>
+                        <li><a href="demos.html">Demos</a></li>
+                        <li><a href="about.html">About Me</a></li>
+                    </ul>
+                </div>
+                <i class="fas fa-bars" onclick="showMenu()"></i>
+            </nav>
+            
+            <div class="sub-text">
+                <h1>Projects</h1>
+            </div>
+        </section>
+        
+        <!--- Projects --->
+        <section class=pro-posts>
+            <a id="qi">
+                <section class="pro-post">
+                    <h2>Qi Wireless Charger</h2>
+                    <p>For my senior design class (three quarter-term series) at Oregon State University, I worked in a team of four on a project entitled "Power Management for Collective Ground Robots." The team consisted of two electrical and computer engineering students, Thomas Snyder <a href="https://www.linkedin.com/in/snyderth/"><i class="fab fa-linkedin-in"></i></a> and me, as well two computer science students, Eric Prather <a href="https://www.linkedin.com/in/eric-prather/"><i class="fab fa-linkedin-in"></i></a> and Miguel Ruiz <a href="https://www.linkedin.com/in/miguel-ruiz-02860732/"><i class="fab fa-linkedin-in"></i></a>. We worked alongside the Human-Machine Teaming laboratory (<a href="https://research.engr.oregonstate.edu/hmtl/">HMTLab</a>) under Dr. Julie Adams <a href="https://www.linkedin.com/in/julieadams3/"><i class="fab fa-linkedin-in"></i></a> to design, implement, and test a power management system for unmanned ground vehicles (UGVs). These UGVs operate in a "swarm" inspired by natural swarming animals such as birds and bees. This means that each robot should be able to make decisions based on data it can observe such as location, obstacles, or targets as well as data collected from nearby robots in the swarm, rather than receiving instructions from a centralized server. The effects of operating robots under this decentralized paradigm is the focus of the swarm robotics research.
+                    </p>
+                    <figure>
+                        <img src="images/ugv.jpg" alt="An unmanned ground vehicle">
+                        <figcaption>An unmanned ground vehicle.</figcaption>
+                    </figure>
+                    <p>Our task was to develop both hardware and software to facilitate battery status and charging tasks. These include determining when the UGV needs to charge and installing hardware which allows the battery to be charged without precise or human-aided positioning. The members of my team who studied computer science programmed the algorithms which determines when the robot needs to charge as well as an optional client-server system which allows for monitoring of collected robot data, which is expandable for a swarm of up to 100 robots. The hardware designed for this project includes a sensor processing board which allows for essential functionality and a wireless charging dock which robots could back into to refill their batteries.
+                    </p>
+                    <p>I designed the wireless charging dock for this project. The charging system had a couple main goals. First, due to some limitations of the accuracy of the sensors on the UGVs, it was desirable to have a larger range for the UGVs to be able to charge within than a standard single-coil charging pad. Another important aspect is that since there can potentially be up to 100 UGVs in the swarm (potentially more once expanded), the charging system should support charging up to 10 UGVs at once. To address each of  these goals, I partitioned the charging system into two modules: one module manages a single charging station, while the other module provides power to up to 10 charging station modules.
+                    </p>
+                    <div class="row">
+                        <div class="pro-fig-2col">
+                            <figure>
+                                <img src="images/qi_mount.jpg" alt="A mounted Qi charging board">
+                                <figcaption>The wireless charging board</figcaption>
+                            </figure>
+                        </div>
+                        <div class="pro-fig-2col">
+                            <figure>
+                                <img src="images/pdb.jpg" alt="A power distribution board">
+                                <figcaption>The power distribution board</figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                    <p>The wireless charging board utilizes a Qi-compliant wireless transmitter integrated circuit which allows for free positioning along a coil array. This means that when a Qi-compliant receiver coil is positioned anywhere along the coil array, the appropriate transmitter coil will begin to tranfer energy. The board that I designed has a few switches which change the settings of the integrated circuit, including the number of coils that the charging station has (up to 4). The power distribution board is much simpler. It consists of a power switch, an indicator LED, a diode to prevent reverse current, and a capacitor to stabilize the voltage. Other than that, it provides power to each of the 10 wireless charging boards.
+                    </p>
+                </section>
+            </a>
+            <a id="robotarm">
+                <section class="pro-post">
+                    <h2>2-Axis Robotic Arm</h2>
+                    <p>The 2-axis robotic arm was for my junior design class, which was a two quarter-term class intended to prepare students for senior design and future design work. Unlike senior design, the project didn't have a client other than the instructor. There were a few constraints and requirements that we were given for the project, but we also chose an additional requirement that added a computer vision feature. This project was designed and implemented by Thomas Snyder <a href="https://www.linkedin.com/in/snyderth/"><i class="fab fa-linkedin-in"></i></a>, Tristan Thompson <a href="https://www.linkedin.com/in/tristan-thompson-a4b52b129/"><i class="fab fa-linkedin-in"></i></a>, and myself.
+                    </p>
+                    <figure>
+                        <img src="images/robotarm_cv.jpg" alt="Robot arm with OpenCV">
+                        <figcaption>Robot Arm with OpenCV demonstration (It did not actually draw that line.)</figcaption>
+                    </figure>
+                    <p>The goal of this project was to create a robotic arm of type SCARA (Selective Compliance Articulated Robot Arm) to be able to draw arbitrary shapes and illustrations. We also included a feature where an image could be given to the system or captured via a webcam and the instructions to replicate the image could be generated and fed to the robot arm using standard G-code commands. For this project, we were able to borrow a SoC FPGA (system on a chip field programmable gate array), and we tried to maximize our usage of it. The flow of data is shown below.
+                    </p>
+                    <figure class="transparent-img">
+                        <img src="images/armflow.png" alt="Robot Arm Data Flow Diagram">
+                        <figcaption>Block diagram of robot arm</figcaption>
+                    </figure>
+                    <p>The user can upload images or capture an image from their device's webcam using the GUI (graphical user interface). This image is fed through some computer vision models using color edge detection, which generates G-code instructions based on the contours mapped from the image. Alternatively, the user can upload a G-code file. The G-code is transmitted through a serial port to the ARM processor included in the SoC FPGA. The ARM processor parses the G-code commands. The FPGA itself is used to compute the inverse kinematics required to translate the cartesian coordinates into the angles to which each axis of the arm should rotate. This is converted into a certain number of steps to which the stepper motors controlling the arm should adjust. The FPGA sends pulses to separate stepper motor driver hardware through the GPIO (general purpose input/output) pins, which in turn change the rotation of the stepper motors.
+                    </p>
+                    <figure>
+                        <video height="500" controls>
+                            <source
+                                src="videos/straight-line.mp4"
+                                type="video/mp4">
+                        </video>
+                        <figcaption>Drawing a "straight" line</figcaption>
+                    </figure>
+                    <p>I personally worked on the GUI, the stepper motor control HDL (Hardware Description Language), and a PCB to hold motor drivers and organize connections. The GUI was written in Python using <a href="https://pysimplegui.readthedocs.io/en/latest/">PySimpleGUI</a>. It allows users to upload images, upload G-code files, capture images using their computer's webcam (when available), and set settings for OpenCV. The output box is used to provide operating information to the user, such as instructing the user to switch to a certain color writing utensil.
+                    </p>
+                    <p>The stepper motor control HDL contains a SystemVerilog module which takes in an 8-bit integer, direction bit, and start signal. When start is asserted, pulses are sent to stepper motor drivers, and it counts the pulses until the desired number of steps is reached. The GPIO pins from the FPGA are connected to the stepper motor driver modules through the PCB. There is also a worm drive which lifts and lowers the writing utensil until the proximity switch contacts the writing surface.
+                    </p>
+                    <div class="row">
+                        <div class="pro-fig-2col">
+                            <figure>
+                                <img src="images/GUI_capture.png" alt="A mounted Qi charging board">
+                                <figcaption>Screenshot of the GUI</figcaption>
+                            </figure>
+                        </div>
+                        <div class="pro-fig-2col">
+                            <figure>
+                                <img src="images/robotarmpcb.png" alt="A power distribution board">
+                                <figcaption>Stepper Motor Driver PCB</figcaption>
+                            </figure>
+                        </div>
+                    </div>
+                </section>
+            </a>
+            <a id="smallsh">
+                <section class="pro-post">
+                    <h2>smallsh</h2>
+                    <p>This project was for my first operating system class. Other projects I did for this class include: a multithreaded producer-consumer pipeline, one time pad, and map reduce. Smallsh is a simple Linux shell. It has three built in commands: exit, cd, and status. Exit and cd are self-explanatory; status prints the exit or termination status of the most recent background task. The shell expands the variable "$$" to its own process ID. The shell supports input and output redirection as well as running tasks in foreground or background. The shell uses signal handlers to prevent SIGINT from terminating the shell or any background processes, instead only terminating the foreground task. The SIGSTP signal toggles foreground only mode, which forces all commands to run in foreground.
+                    </p>
+                    <figure>
+                        <img src="images/smallsh.png" alt="smallsh demonstrating an example usage">
+                        <figcaption>Example operation of smallsh</figcaption>
+                    </figure>
+                </section>
+            </a>
+        </section>
+
+
+        
+        <!---  Footer  --->
+        
+        <section class="footer">
+            <h4>Contact</h4>
+            <p>Contact information can be found linked below.</p>
+            <div class="pro-icons">
+                <a href="https://www.linkedin.com/in/kyle-n-noble/"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://github.com/KyleNo"><i class="fab fa-github"></i></a>
+            </div>
+            <p>Website created by Kyle Noble.</p>
+        </section>
+        
+        <!--- JavaScript for Mobile Menu Toggle --->
+        <script>
+            var navLinks = document.getElementById("navLinks");
+            
+            function showMenu(){
+                navLinks.style.right = "0";
+            }
+            function hideMenu(){
+                navLinks.style.right = "-200px";
+            }
+        </script>
+    </body>
+</html>
