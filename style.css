@@ -271,6 +271,15 @@ h3{
 }
 
 /* projects.html */
+/*
+article {
+    counter-reset: heading;
+}
+article h2::before{
+    counter-increment: heading;
+    content: counter(heading)'. ';
+}
+*/
 .pro-header{
     min-height: 50vh;
     width: 100%;
@@ -474,4 +483,116 @@ h3{
     background-color: #31f552;
     color: #fff;
     transition 0.75s;
+}
+
+/* Individual Demos*/
+.small-demo-header{
+    min-height: 20vh;
+    width: 100%;
+    background-image: linear-gradient(rgba(30,30,30,0.7), rgba(30,30,30,0.7)), url(images/coral.jpg);
+    background-position: center;
+    background-size: cover;
+    position: relative;
+    border-bottom: 1px solid black;
+}
+.small-demo-header .sub-text{
+    bottom: 5%;
+}
+
+/* LZW */
+.lzw-table table{
+    vertical-align: middle;
+    text-align: center;
+    border-spacing: 0;
+}
+.lzw-table table thead tr th,
+.lzw-table table tr td{
+    border: 1px solid #DDD;
+    background-color: #FFF;
+    padding: 1px;
+    width: 15%;
+}
+
+.lzw-table table thead tr th {
+    position: sticky;
+    top: 0;
+}
+.lzw-table{
+    flex-basis: 40%;
+    margin-bottom: 5%;
+    padding: 20px 12px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.controls{
+    flex-basis: 50%;
+    margin-bottom: 5%;
+    padding: 20px 12px;
+    text-align: center;
+}
+#enc-output{
+    word-break: break-word;
+    overflow-y: scroll;
+    line-height: 2.5;
+    width: 90%;
+    max-width: 600px;
+    max-height: 30vh;
+    margin: auto;
+    
+    border: 1px solid #DDD;
+}
+.sticky{
+    position: sticky;
+    top: 0;
+    border: 1px solid #DDD;
+    text-align: justify;
+    width: 90%;
+    margin: auto;
+    padding-bottom: 10px;
+}
+.output-highlight{
+    padding: 5px;
+    transition: transform 0.5s;
+    border-radius: 5px;
+}
+.auto_height { /* CSS */
+    width: 90%;
+    max-width: 600px;
+}
+.txt-btn{
+    text-align: center;
+    padding: 5px;
+}
+#decimal-output{
+    overflow-wrap: normal;
+    overflow-y: scroll;
+    line-height: 1.3;
+    width: 90%;
+    max-width: 600px;
+    max-height: 30vh;
+    margin: auto;
+    
+    border: 1px solid #DDD;
+}
+.decimal-span{
+    padding: 0;
+}
+@media(max-width: 700px){
+    .lzw-table table thead tr th{
+        font-size: 11px;
+    }
+    #enc-output,
+    #decimal-output{
+        width: 80%;
+    }
+}
+.demo-expl{
+    width: 90%;
+    max-width: 800px;
+    margin: auto;
+    padding-top: 50px;
+    text-align: center;
+}
+.demo-expl p{
+    text-align: justify;
 }

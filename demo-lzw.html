@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <base href=".">
+        <meta name="viewport" content="with=device-width, initial-scale=1.0" charset="UTF-8">
+        <title>LZW Compression</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=MonteCarlo&display=swap" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/6d6b6b0664.js" crossorigin="anonymous"></script>
+    </head>
+    <body>
+        <section class="small-demo-header">
+            <nav>
+                <a href="index.html">Kyle Noble</a>
+                <div class="nav-links" id="navLinks">
+                    <i class="far fa-times-circle" onclick="hideMenu()"></i>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="projects.html">Projects</a></li>
+                        <li><a href="demos.html">Demos</a></li>
+                        <li><a href="about.html">About Me</a></li>
+                    </ul>
+                </div>
+                <i class="fas fa-bars" onclick="showMenu()"></i>
+            </nav>
+            <div class="sub-text">
+                <h1>LZW Compression</h1>
+            </div>
+        </section>
+        
+        <section>
+            <div class="demo-expl">
+                <h3>History</h3>
+                <p>LZW (Lempel-Ziv-Welch) is a universal lossless data compression algorithm. It is easy to demonstrated for text, but the compression algorithm can be applied to other data types, such as images. Notably, this algorithm is part of the GIF image format. It is also used in the Unix shell program "compress," which has since been deprecated in favor of "DEFLATE," which uses the LZ77 algorithm. The patent for LZW was filed in 1983 and expired in 2003. The compression ratio for sufficiently large English text files is about 50%.
+                </p>
+                <h3>LZW Algorithm</h3>
+                <p>The basic premise of this compression algorithm is that a dictionary is constructed, which is built from substrings that have previously been seen when parsing the file. The key in the dictionary is the substring and the value is an increasing index. Initially, the dictionary is filled with all usable characters and a substring is set as the first character of the data. The algorithm checks whether the substring concatenated with the next character of the data is in the dictionary. If it is, then this new concatenated string becomes the new substring and nothing is outputted. If it isn't, then the code for the substring is outputted, the convatenated string is added to the dictionary, and the new substring is set as the next character. This is repeated for the rest of the data.
+                </p>
+                <h3>About this Demo</h3>
+                <p>This implementation uses standard UTF-8 characters 0-255 for the initial dictionary. Enter any amount of text into the text area on the right and click the "Encode" button. The entries in the initial dictionary are hidden, and result of each character is shown in the table on the left. The sequence mapping section shows how the input text is coded by reusing substrings saved in the dictionary. Hovering over a substring in this section will highlight the corresponding dictionary entry and index. The decimal output section at the bottom shows a list of decimal values which represents the compressed output data. This would normally be in binary, but it is more convenient to read decimal.
+                </p>
+            </div>
+        </section>
+        
+        <section class="demo-lzw">
+            <!--- lzw demo --->
+            <div class="row">
+                <div class="lzw-table">
+                    <table style="width:100%" id="lzw-tab">
+                        <thead>
+                        <tr>
+                            <th>Current Sequence</th>
+                            <th>Next Char</th>
+                            <th>Output Sequence</th>
+                            <th>Output Index</th>
+                            <th>Index</th>
+                            <th>Added Dictionary Entry</th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <div class="controls">
+                    <div class="sticky">
+                        <h3>String to Encode:</h3>
+                        <div class="txt-btn">
+                            <textarea rows="1" class="auto_height" oninput="auto_height(this)" id="encode-str"></textarea>
+                            <br /> <br />
+                            <button id="encode-btn" onclick="updateStr()">Encode</button>
+                        </div>
+                        <h3>Sequence Mapping</h3>
+                        <p id="enc-output"></p>
+                        <h3>Decimal Output</h3>
+                        <p id="decimal-output"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        
+
+        
+        
+        <!---  Footer  --->
+        
+        <section class="footer">
+            <h4>Contact</h4>
+            <p>Contact information can be found linked below.</p>
+            <div class="demo-icons">
+                <a href="https://www.linkedin.com/in/kyle-n-noble/"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://github.com/KyleNo"><i class="fab fa-github"></i></a>
+            </div>
+            <p>Website created by Kyle Noble.</p>
+        </section>
+        
+        <!--- JavaScript for Mobile Menu Toggle --->
+        <script>
+            var navLinks = document.getElementById("navLinks");
+            
+            function showMenu(){
+                navLinks.style.right = "0";
+            }
+            function hideMenu(){
+                navLinks.style.right = "-200px";
+            }
+        </script>
+        <script src="scripts/lzw.js"></script>
+    </body>
+</html>
