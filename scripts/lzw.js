@@ -47,10 +47,12 @@ function updateStr(){
             span = document.createElement("span");
             span.innerHTML = s;
             span.className = "output-highlight";
+            span.id = `span-${spanCount}`;
             p.appendChild(span);
             span = document.createElement("span");
             span.innerHTML = `${dict[s]}`
             span.className = "decimal-span";
+            span.id = `span-${spanCount}-dec`;
             p_dec.appendChild(span);
             p_dec.insertAdjacentHTML('beforeend', " ");
             spanCount ++;
@@ -78,10 +80,12 @@ function updateStr(){
     span = document.createElement("span");
     span.innerHTML = s;
     span.className = "output-highlight";
+    span.id = `span-${spanCount}`;
     p.appendChild(span);
     span = document.createElement("span");
     span.innerHTML = `${dict[s]}`
     span.className = "decimal-span";
+    span.id = `span-${spanCount}-dec`;
     p_dec.appendChild(span);
     spanCount ++;
     p.addEventListener('mouseenter', function(e){
@@ -90,9 +94,14 @@ function updateStr(){
             let temp = dict[e.target.innerHTML];
             var cell5 = document.getElementById(`idx-${temp}a`);
             var cell6 = document.getElementById(`idx-${temp}b`);
+            span = document.getElementById(e.target.id + "-dec");
             if(cell5){
                 cell5.style.background = '#31f5f5';
                 cell6.style.background = '#31f5f5';
+            }
+            if(span){
+                span.style.background = '#31f5f5';
+                console.log(span.className);
             }
         }
     }, true);
@@ -102,9 +111,13 @@ function updateStr(){
             let temp = dict[e.target.innerHTML];
             var cell5 = document.getElementById(`idx-${temp}a`);
             var cell6 = document.getElementById(`idx-${temp}b`);
+            span = document.getElementById(e.target.id + "-dec");
             if(cell5){
                 cell5.style.background = '#ffffff';
                 cell6.style.background = '#ffffff';
+            }
+            if(span){
+                span.style.background = '#ffffff';
             }
         }
     }, true);
