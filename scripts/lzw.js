@@ -8,6 +8,7 @@ function updateStr(){
     let p_dec = document.getElementById("decimal-output")
     let span = document.createElement("span");
     let spanCount = 0;
+    //let textArea = document.getElementsByClassName("auto_height")[0];
     //clear original table
     table.innerHTML = "";
     //clear output
@@ -124,6 +125,7 @@ function updateStr(){
         var value = dict[key];
         //console.log(key, value);
     }
+    inputText.style.height = "40px";
 }
 
 function auto_height(elem) {  /* javascript */
