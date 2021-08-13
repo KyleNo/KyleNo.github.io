@@ -283,6 +283,11 @@ function calcEntropy(c, n){ //c = counterobject, n = number of symbols
     }
     return sum;
 }
+function hideCustomDefault(){
+    e = document.getElementById("dict-select");
+    console.log(e.value);
+    onDictSel(e);
+}
 function onDictSel(e){
     div = document.getElementById("custom-dict-box");
     if (e.value === "custom") {
