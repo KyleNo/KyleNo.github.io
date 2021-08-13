@@ -33,13 +33,13 @@
         <section>
             <div class="demo-expl">
                 <h3>History</h3>
-                <p>LZW (Lempel-Ziv-Welch) is a universal lossless data compression algorithm. It is easy to demonstrated for text, but the compression algorithm can be applied to other data types, such as images. Notably, this algorithm is part of the GIF image format. It is also used in the Unix shell program "compress," which has since been deprecated in favor of "DEFLATE," which uses the LZ77 algorithm. The patent for LZW was filed in 1983 and expired in 2003. The compression ratio for sufficiently large English text files is about 50%.
+                <p>LZW (Lempel-Ziv-Welch) is a universal lossless data compression algorithm. It is easy to demonstrated for text, but the compression algorithm can be applied to other data types, such as images. Notably, this algorithm is part of the GIF image format. It is also used in the Unix shell program "compress," which has since been deprecated in favor of "DEFLATE," which uses the LZ77 algorithm. The patent for LZW was filed in 1983 and expired in 2003. The compression ratio for sufficiently large English text files is about 2:1.
                 </p>
                 <h3>LZW Algorithm</h3>
                 <p>The basic premise of this compression algorithm is that a dictionary is constructed, which is built from substrings that have previously been seen when parsing the file. The key in the dictionary is the substring and the value is an increasing index. Initially, the dictionary is filled with all usable characters and a substring is set as the first character of the data. The algorithm checks whether the substring concatenated with the next character of the data is in the dictionary. If it is, then this new concatenated string becomes the new substring and nothing is outputted. If it isn't, then the code for the substring is outputted, the convatenated string is added to the dictionary, and the new substring is set as the next character. This is repeated for the rest of the data.
                 </p>
                 <h3>About this Demo</h3>
-                <p>This implementation uses standard UTF-8 characters 0-255 for the initial dictionary. Enter any amount of text into the text area on the right and click the "Encode" button. The entries in the initial dictionary are hidden, and result of each character is shown in the table on the left. The sequence mapping section shows how the input text is coded by reusing substrings saved in the dictionary. Hovering over a substring in this section will highlight the corresponding dictionary entry and index. The decimal output section at the bottom shows a list of decimal values which represents the compressed output data. This would normally be in binary, but it is more convenient to read decimal.
+                <p>This implementation uses a variety of common symbol collections as the initial dictionary. You can choose one of the default options or enter your own dictionary. Enter any amount of text into the text area on the right and click the "Encode" button. The entries in the initial dictionary are hidden, and result of each character is shown in the table on the left. The sequence mapping section shows how the input text is coded by reusing substrings saved in the dictionary. Hovering over a substring in this section will highlight the corresponding dictionary entry and index. The decimal output section at the bottom shows a list of decimal values which represents the compressed output data. This would normally be in binary and use variable length encoding, but it is more convenient to read decimal. Additionally, there is an option to choose different characters to demarcate the strings, which can help make spaces more visible.
                 </p>
             </div>
         </section>
@@ -67,13 +67,91 @@
                         <h3>String to Encode:</h3>
                         <div class="txt-btn">
                             <textarea rows="1" class="auto_height" oninput="auto_height(this)" id="encode-str" spellcheck="false"></textarea>
-                            <br /> <br />
-                            <button id="encode-btn" onclick="updateStr()">Encode</button>
+                            <div class="row">
+                                <div class="control-col">
+                                    <label for="dictionary">Select Symbol Set</label>
+                                    <br />
+                                    <select name="dictionary" id="dict-select" onchange="onDictSel(this)">
+                                        <option value="ASCII">ASCII (128)</option>
+                                        <option value="UTF-8">UTF-8 (First 256)</option>
+                                        <option value="A-Z">A-Z (case insensitive)</option>
+                                        <option value="0-9">Numeric (0-9)</option>
+                                        <option value="an">Alphanumeric (0-9, A-Z)</option>
+                                        <option value="csan">Case Sensitive Alphanumeric (0-9, A-Z, a-z)</option>
+                                        <option value="csanp" title="0-9, A-Z, a-z, spaces, commas, periods, question marks, exclamation marks">C.S. Aphanumeric w/ Basic Punctuation</option>
+                                        <option value="custom">Custom</option>
+                                    </select>
+                                </div>
+                                <div class="control-col">
+                                    <label for="str-mark">Select String Demarcation</label>
+                                    <br />
+                                    <select name="str-mark" id="str-mark-select">
+                                        <option value="none">None</option>
+                                        <option value="single">Single Quote</option>
+                                        <option value="double">Double Quote</option>
+                                        <option value="saquo">Single Right Angle Quote</option>
+                                        <option value="aquo">Right Angle Quote</option>
+                                    </select>
+                                </div>
+                                <div class="control-col">
+                                    <button id="encode-btn" onclick="encode()">Encode</button>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="custom-dict-box" id="custom-dict-box">
+                            <h3>Enter Custom Dictionary</h3>
+                            <textarea rows="1" class="auto_height" oninput="auto_height(this)" id="custom-dict" spellcheck="false"></textarea>
+                            <p class="stats-desc">Type all characters that you would like to include in the initial dictionary. The characters should not have any separators (i.e. if you separate with spaces, the space character will be included in the dictionary). The characters will be indexed in the order that they are typed here, rather than being lexicographically sorted. Duplicates will be ignored.</p>
                         </div>
                         <h3>Sequence Mapping</h3>
                         <p id="enc-output"></p>
                         <h3>Decimal Output</h3>
                         <p id="decimal-output"></p>
+                        <h3>Statistics</h3>
+                        <table id="lzw-stat-tab">
+                            <thead>
+                                <tr>
+                                    <th>Stat</th>
+                                    <th>Input Data</th>
+                                    <th>Output Data</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <th>Number of Symbols</th>
+                                    <td id="i-num"></td>
+                                    <td id="o-num"></td>
+                                </tr>
+                                <tr>
+                                    <th>Total Bits Required</th>
+                                    <td id="i-bit"></td>
+                                    <td id="o-bit"></td>
+                                </tr>
+                                <tr>
+                                    <th>Average Code Length</th>
+                                    <td id="i-acl"></td>
+                                    <td id="o-acl"></td>
+                                </tr>
+                                <tr>
+                                    <th>Shannon Entropy</th>
+                                    <td id="i-ent"></td>
+                                    <td id="o-ent"></td>
+                                </tr>
+                                <tr>
+                                    <th>Compression Ratio</th>
+                                    <td id="i-com"></td>
+                                    <td id="o-com"></td>
+                                </tr>
+                                <tr>
+                                    <th>Space Saving</th>
+                                    <td id="i-sps"></td>
+                                    <td id="o-sps"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <p class="stats-desc">These statistics are to compare the original data without compression using fixed-length symbol codes with the compressed data assuming variable-width encoding is used. The variable width encoding scheme that is normally used with LZW initially uses widths of 1 bit wider than the symbols' width then increments the width by 1 once a dictionary entry is added with an index that can't fit in the current width. I.e., when the width is p bits and the 2<sup>p</sup> dictionary entry is added, the symbol after the current symbol will be sent with width p+1.
+                        </p>
                     </div>
                 </div>
             </div>

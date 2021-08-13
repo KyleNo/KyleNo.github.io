@@ -429,7 +429,6 @@ article h2::before{
 }
 .demo-post .demo-col{
     background-color: #d0f5f5;
-    color
 }
 .demo-icons .fab{
     color: #31f5f5;
@@ -547,6 +546,8 @@ article h2::before{
     border: 1px solid #DDD;
     text-align: justify;
     width: 90%;
+    max-height: 95vh;
+    overflow-y: scroll;
     margin: auto;
     padding-bottom: 10px;
 }
@@ -558,6 +559,8 @@ article h2::before{
 .auto_height {
     width: 90%;
     max-width: 600px;
+    margin: auto;
+    display: block;
 }
 .txt-btn{
     text-align: center;
@@ -594,4 +597,39 @@ article h2::before{
 }
 .demo-expl p{
     text-align: justify;
+}
+.stats-desc{
+    width: 90%;
+    max-width: 600px;
+    margin: auto;
+}
+#lzw-stat-tab thead tr th,
+#lzw-stat-tab tbody tr td,
+#lzw-stat-tab tbody tr th{
+    width: 30%;
+    border: 1px solid #DDD;
+    padding 5px;
+    text-align: center;
+}
+#lzw-stat-tab{
+    border-spacing: 0;
+    vertical-align: middle;
+    padding: 5px;
+    margin: auto;
+}
+.custom-dict-sel{
+    text-align: center;
+    margin: auto;
+}
+.txt-btn .row{
+    width: 80%;
+    margin-right: auto;
+    margin-left: auto;
+}
+.control-col{
+    flex-basis: 30%;
+    margin-top: auto;
+    margin-right: auto;
+    margin-left: auto;
+    padding: 20px;
 }
