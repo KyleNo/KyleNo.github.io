@@ -482,7 +482,6 @@ function decode(){
     //regex to consider any amount of spaces or commas as one delimiter
     var indices = [];
     for (symbol of symbols){
-        //console.log(symbol);
         if(symbol){ //avoid parsing empty strings (if delimiter is at end of string)
             indices.push(parseInt(symbol, 10));
         }
