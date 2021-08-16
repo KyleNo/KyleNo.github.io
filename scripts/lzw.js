@@ -461,7 +461,6 @@ function decode(){
     
     //get the size of initial dictionary for statistics
     let dSize = idx-1;
-    //console.log(dSize);
     
     //entry number which requires increasing bit width
     let bitPerCode = Math.ceil(Math.log2(dSize))+1;
