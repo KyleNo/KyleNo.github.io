@@ -39,7 +39,7 @@
                 <p>The basic premise of this compression algorithm is that a dictionary is constructed, which is built from substrings that have previously been seen when parsing the file. The key in the dictionary is the substring and the value is an increasing index. Initially, the dictionary is filled with all usable characters and a substring is set as the first character of the data. The algorithm checks whether the substring concatenated with the next character of the data is in the dictionary. If it is, then this new concatenated string becomes the new substring and nothing is outputted. If it isn't, then the code for the substring is outputted, the convatenated string is added to the dictionary, and the new substring is set as the next character. This is repeated for the rest of the data.
                 </p>
                 <h3>About this Demo</h3>
-                <p>This implementation uses a variety of common symbol collections as the initial dictionary. You can choose one of the default options or enter your own dictionary. Enter any amount of text into the text area on the right and click the "Encode" button. The entries in the initial dictionary are hidden, and result of each character is shown in the table on the left. The sequence mapping section shows how the input text is coded by reusing substrings saved in the dictionary. Hovering over a substring in this section will highlight the corresponding dictionary entry and index. The decimal output section at the bottom shows a list of decimal values which represents the compressed output data. This would normally be in binary and use variable length encoding, but it is more convenient to read decimal. Additionally, there is an option to choose different characters to demarcate the strings, which can help make spaces more visible.
+                <p>This implementation uses a variety of common symbol collections as the initial dictionary. You can choose one of the default options or enter your own dictionary. Enter any amount of text into the text area on the right and click the "Encode" button. The entries in the initial dictionary are hidden, and result of each character is shown in the table on the left. The sequence mapping section shows how the input text is coded by reusing substrings saved in the dictionary. Hovering over a substring in this section will highlight the corresponding dictionary entry and index. The decimal output section at the bottom shows a list of decimal values which represents the compressed output data. This would normally be in binary and use variable length encoding, but it is more convenient to read decimal. Additionally, there is an option to choose different characters to demarcate the strings, which can help make spaces more visible. Another important thing to note, is that this implementation limits the size of the dictionary to 4096 (2<sup>12</sup>) entries, as originally described in <a href="https://courses.cs.duke.edu/spring03/cps296.5/papers/welch_1984_technique_for.pdf">Welch's 1984 paper</a>.
                 </p>
             </div>
         </section>
@@ -64,14 +64,15 @@
                 </div>
                 <div class="controls">
                     <div class="sticky">
-                        <h3>String to Encode:</h3>
+                        <h3>String to Encode or Decimal code to Decode:</h3>
                         <div class="txt-btn">
-                            <textarea rows="1" class="auto_height" oninput="auto_height(this)" id="encode-str" spellcheck="false"></textarea>
+                            <textarea rows="1" class="auto_height" oninput="auto_height(this)" id="input-str" spellcheck="false"></textarea>
+                            <p>For decoding, enter a list of dictionary indices in decimal separated by spaces or commas.</p>
                             <div class="row">
                                 <div class="control-col">
                                     <label for="dictionary">Select Symbol Set</label>
                                     <br />
-                                    <select name="dictionary" id="dict-select" onchange="onDictSel(this)">
+                                    <select name="dictionary" id="dict-select" class="lzw-select" onchange="onDictSel(this)">
                                         <option value="ASCII">ASCII (128)</option>
                                         <option value="UTF-8">UTF-8 (First 256)</option>
                                         <option value="A-Z">A-Z (case insensitive)</option>
@@ -85,7 +86,7 @@
                                 <div class="control-col">
                                     <label for="str-mark">Select String Demarcation</label>
                                     <br />
-                                    <select name="str-mark" id="str-mark-select">
+                                    <select name="str-mark" id="str-mark-select" class="lzw-select">
                                         <option value="none">None</option>
                                         <option value="single">Single Quote</option>
                                         <option value="double">Double Quote</option>
@@ -94,7 +95,8 @@
                                     </select>
                                 </div>
                                 <div class="control-col">
-                                    <button id="encode-btn" onclick="encode()">Encode</button>
+                                    <button id="encode-btn" class="lzw-btn" onclick="encode()">Encode</button>
+                                    <button id="decode-btn" class="lzw-btn" onclick="decode()">Decode</button>
                                 </div>
                             </div>
                             
@@ -106,15 +108,15 @@
                         </div>
                         <h3>Sequence Mapping</h3>
                         <p id="enc-output"></p>
-                        <h3>Decimal Output</h3>
+                        <h3>Encoded Decimal Output or Decoded Text Output</h3>
                         <p id="decimal-output"></p>
                         <h3>Statistics</h3>
                         <table id="lzw-stat-tab">
                             <thead>
                                 <tr>
                                     <th>Stat</th>
-                                    <th>Input Data</th>
-                                    <th>Output Data</th>
+                                    <th>Plaintext Data</th>
+                                    <th>Compressed Data</th>
                                 </tr>
                             </thead>
                             <tbody>

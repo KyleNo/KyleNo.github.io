@@ -573,7 +573,7 @@ article h2::before{
     max-width: 600px;
     max-height: 30vh;
     margin: auto;
-    
+    word-break: break-word;
     border: 1px solid #DDD;
 }
 .decimal-span{
@@ -617,13 +617,34 @@ article h2::before{
     padding: 5px;
     margin: auto;
 }
-
+.lzw-btn{
+    display: inline-block;
+    text-decoration: none;
+    width: 100px;
+    height: 40px;
+    color: #000;
+    border: 1px solid #555;
+    padding: 0;
+    font-size: 16px;
+    background: transparent;
+    position: relative;
+    cursor: pointer;
+    transition: 0.25s;
+    margin-top: 5px;
+}
+.lzw-btn:hover{
+    /*border: 1px solid #fff;*/
+    background: #31f5f5;
+    
+    transition: 0.75s;
+}
 .custom-dict-sel{
     text-align: center;
     margin: auto;
 }
 .txt-btn .row{
     width: 80%;
+    margin-top: 0;
     margin-right: auto;
     margin-left: auto;
 }
@@ -633,4 +654,20 @@ article h2::before{
     margin-right: auto;
     margin-left: auto;
     padding: 20px;
+}
+.lzw-select{
+    padding: 5px;
+    position: relative;
+    /*
+    color: #000;
+    background: #b8f5f5;
+    */
+}
+.lzw-select options{
+    padding: 5px;
+    position: relative;
+    /*
+    color: #000;
+    background: #b8f5f5;
+    */
 }
