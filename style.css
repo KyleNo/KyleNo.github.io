@@ -671,3 +671,34 @@ article h2::before{
     background: #b8f5f5;
     */
 }
+.code-col{
+    margin-top: auto;
+    margin-right: auto;
+    margin-left: auto;
+    padding: 20px;
+    display: inline-block;
+    vertical-align: top;
+    
+}
+.pseudocode{
+    background-color: #f1f1f1;
+    margin: auto;
+    display: block;
+    padding: 20px;
+    text-align: left;
+}
+code{
+    font-family: monospace;
+    margin: auto;
+    display: inline-block;
+    align-content: center;
+}
+#pseudo{
+    max-width: 1000px;
+    margin: auto;
+    display: block;
+    text-align: center;
+}
+sup{
+    line-height: 0;
+}

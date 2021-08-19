@@ -9,6 +9,7 @@
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=MonteCarlo&display=swap" rel="stylesheet">
         <script src="https://kit.fontawesome.com/6d6b6b0664.js" crossorigin="anonymous"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
     </head>
     <body onload="hideCustomDefault()">
         <section class="small-demo-header">
@@ -42,6 +43,38 @@
                 <p>This implementation uses a variety of common symbol collections as the initial dictionary. You can choose one of the default options or enter your own dictionary. Enter any amount of text into the text area on the right and click the "Encode" button. The entries in the initial dictionary are hidden, and result of each character is shown in the table on the left. The sequence mapping section shows how the input text is coded by reusing substrings saved in the dictionary. Hovering over a substring in this section will highlight the corresponding dictionary entry and index. The decimal output section at the bottom shows a list of decimal values which represents the compressed output data. This would normally be in binary and use variable length encoding, but it is more convenient to read decimal. Additionally, there is an option to choose different characters to demarcate the strings, which can help make spaces more visible. Another important thing to note, is that this implementation limits the size of the dictionary to 4096 (2<sup>12</sup>) entries, as originally described in <a href="https://courses.cs.duke.edu/spring03/cps296.5/papers/welch_1984_technique_for.pdf">Welch's 1984 paper</a>.
                 </p>
             </div>
+            <div class="row" id="pseudo">
+                <div class="code-col">
+                    <h3>Encoder Pseudocode</h3>
+<pre class="pseudocode"><code>d = dictionary with every possible character as key
+i = size of d
+s = first character of data
+while there is data to read:
+    c = next character of data
+    if s+c is in d:
+        s = s+c
+    else:
+        output d[s]
+        d[s+c] = i++
+        s = c
+output d[s]</code></pre>
+                </div>
+                <div class="code-col">
+                    <h3>Decoder Pseudocode</h3>
+<pre class="pseudocode"><code>d = dictionary with every possible character as value
+i = size of d
+s = null
+while there is data to read:
+    j = next code
+    entry = d[j]
+    output entry
+    if s is not null:
+        d[i] = s + first character of entry
+        increment i
+    s = entry
+</code></pre>
+                </div>
+            </div>
         </section>
         
         <section class="demo-lzw">
@@ -64,10 +97,10 @@
                 </div>
                 <div class="controls">
                     <div class="sticky">
-                        <h3>String to Encode or Decimal code to Decode:</h3>
+                        <h3>String to Encode or Numerical Code to Decode:</h3>
                         <div class="txt-btn">
                             <textarea rows="1" class="auto_height" oninput="auto_height(this)" id="input-str" spellcheck="false"></textarea>
-                            <p>For decoding, enter a list of dictionary indices in decimal separated by spaces or commas.</p>
+                            <p  class="stats-desc">For decoding, enter a list of dictionary indices in your chosen radix separated by spaces or commas. If you select "Treat binary data as bitstream" then whitespace and commas will be ignored. Instead, the indices will be separated from the bitstream using the variable-width encoding scheme described in the statistics section. This setting also removes whitespace from the encoding output and gives the correct number of leading zeros for each code.</p>
                             <div class="row">
                                 <div class="control-col">
                                     <label for="dictionary">Select Symbol Set</label>
@@ -94,8 +127,27 @@
                                         <option value="aquo">Right Angle Quote</option>
                                     </select>
                                 </div>
+                            </div>
+                            <div class="row">
+                                <div class="control-col">
+                                    <select name="radix" id="radix-sel" class="lzw-select"  onchange="onRadixSel(this)">
+                                        <option value=10>Decimal</option>
+                                        <option value=2>Binary</option>
+                                        <option value=16>Hexadecimal</option>
+                                        <option value=8>Octal</option>
+                                    </select>
+                                    <br />
+                                    <label for="radix">Encoding Radix</label>
+                                </div>
+                                <div class="control-col" id="bitstream-box">
+                                    <input type="checkbox" name="bin-bitstream" id="use-bitstream">
+                                    <br>
+                                    <label for="bin-bitstream" id="bitstream-label">Treat binary data as bitstream</label>
+                                </div>
                                 <div class="control-col">
                                     <button id="encode-btn" class="lzw-btn" onclick="encode()">Encode</button>
+                                </div>
+                                <div class="control-col">
                                     <button id="decode-btn" class="lzw-btn" onclick="decode()">Decode</button>
                                 </div>
                             </div>
@@ -108,8 +160,13 @@
                         </div>
                         <h3>Sequence Mapping</h3>
                         <p id="enc-output"></p>
-                        <h3>Encoded Decimal Output or Decoded Text Output</h3>
-                        <p id="decimal-output"></p>
+                        <h3>Encoded Numerical Output or Decoded Text Output</h3>
+                        <div id="output-copy">
+                            <p id="decimal-output"></p>
+                        </div>
+                        <br />
+                        <button id="copy-btn" class="lzw-btn" onclick="copyToClipboard('#decimal-output')" style="height: 60px; margin: auto; display: block;">Copy Output to Clipboard</button>
+                        <br />
                         <h3>Statistics</h3>
                         <table id="lzw-stat-tab">
                             <thead>

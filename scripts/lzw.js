@@ -1,4 +1,5 @@
 const maxDictSize = 4096;
+var lastRadix = 10;
 function encode(){
     var inputText = document.getElementById("input-str");
     let originalStr = inputText.value;
@@ -12,6 +13,10 @@ function encode(){
     
     let dictSel = document.getElementById("dict-select").value;
     let demarkSel = document.getElementById("str-mark-select").value;
+    
+    let radix = parseInt(document.getElementById("radix-sel").value, 10);
+    lastRadix = radix;
+    let useBitstream = document.getElementById("use-bitstream").checked;
     
     //let textArea = document.getElementsByClassName("auto_height")[0];
     //clear original table
@@ -62,8 +67,10 @@ function encode(){
             addToCounter(outputCounter, s);
             
             //output s into paragraph
-            addSpans(span, s, spanCount, dict, p, p_dec);
-            p_dec.insertAdjacentHTML('beforeend', " ");
+            addSpans(span, s, spanCount, dict, p, p_dec, radix, bitPerCode, useBitstream);
+            if (radix!==2 || !useBitstream){
+                p_dec.insertAdjacentHTML('beforeend', " ");
+            }
             spanCount ++;
             console.log(`enc: ${bitPerCode}`);
             totalCompressedBits += bitPerCode;
@@ -92,7 +99,7 @@ function encode(){
     }
     //output s
     addToCounter(outputCounter, s);
-    addSpans(span, s, spanCount, dict, p, p_dec);
+    addSpans(span, s, spanCount, dict, p, p_dec, radix, bitPerCode, useBitstream);
     spanCount ++;
     totalCompressedBits += bitPerCode;
     insertEOF(table, s, dict, leftDemarc, rightDemarc);
@@ -370,21 +377,40 @@ function insertDec(table, s, entry, index, i, dict, l, r){
     cell5.innerHTML = `${i}`;
     cell6.innerHTML = l+s+entry[0]+r;
 }
-function addSpans(span, s, spanCount, dict, p, p_dec){
+function addSpans(span, s, spanCount, dict, p, p_dec, radix, bitPerCode, useBitstream){
     span = document.createElement("span");
     span.innerHTML = s;
     span.className = "output-highlight";
     span.id = `span-${spanCount}`;
     p.appendChild(span);
     span = document.createElement("span");
-    span.innerHTML = `${dict[s]}`
+    const zero = "0";
+    if(radix===2 && useBitstream){
+        var str = dict[s].toString(radix);
+        span.innerHTML = zero.repeat(bitPerCode - str.length) + str;
+    }
+    else{
+        span.innerHTML = dict[s].toString(radix);
+    }
     span.className = "decimal-span";
     span.id = `span-${spanCount}-dec`;
     p_dec.appendChild(span);
 }
-function addSpansDec(span, index, idx, spanCount, entry, p, p_dec){
+function addSpansDec(span, index, idx, spanCount, entry, p, p_dec, radix){
     span = document.createElement("span");
-    span.innerHTML = `${index}`;
+    span.innerHTML = index.toString(radix);
+    span.className = "output-highlight";
+    span.id = `span-${spanCount}`;
+    p.appendChild(span);
+    span = document.createElement("span");
+    span.innerHTML = `${entry}`
+    span.className = "decimal-span";
+    span.id = `span-${spanCount}-dec`;
+    p_dec.appendChild(span);
+}
+function addSpansDecBit(span, index, idx, spanCount, entry, p, p_dec, bin_num){
+    span = document.createElement("span");
+    span.innerHTML = bin_num;
     span.className = "output-highlight";
     span.id = `span-${spanCount}`;
     p.appendChild(span);
@@ -404,7 +430,9 @@ function calcEntropy(c, n){ //c = counterobject, n = number of symbols
 }
 function hideCustomDefault(){
     e = document.getElementById("dict-select");
+    c = document.getElementById("radix-sel");
     onDictSel(e);
+    onRadixSel(c);
 }
 function onDictSel(e){
     div = document.getElementById("custom-dict-box");
@@ -446,6 +474,11 @@ function decode(){
     let dictSel = document.getElementById("dict-select").value;
     let demarkSel = document.getElementById("str-mark-select").value;
     
+    let radix = parseInt(document.getElementById("radix-sel").value, 10);
+    lastRadix = radix;
+    let useBitstream = document.getElementById("use-bitstream").checked;
+    console.log(useBitstream);
+    
     //let textArea = document.getElementsByClassName("auto_height")[0];
     //clear original table
     table.innerHTML = "";
@@ -477,54 +510,99 @@ function decode(){
     var leftDemarc = getLeftDemarc(demarkSel);
     var rightDemarc = getRightDemarc(demarkSel);
     
-    //get list of integers from string
-    var symbols = originalStr.split(/(?:,| )+/);
-    //regex to consider any amount of spaces or commas as one delimiter
-    var indices = [];
-    for (symbol of symbols){
-        if(symbol){ //avoid parsing empty strings (if delimiter is at end of string)
-            indices.push(parseInt(symbol, 10));
-        }
-    }
-    //decoding process
-    var s=undefined;
-    var entry=undefined;
-    for (var index of indices){
-        entry = dict[index];
-        if (entry === undefined){
-            entry = s + s[0];
-        }
-        //console.log(entry);
-        addToCounter(outputCounter, entry);
-        for(char of entry){
-            addToCounter(inputCounter, char);
-        }
-        numInputSym += entry.length;
-        addSpansDec(span, index, idx, spanCount, entry, p, p_dec);
-        spanCount++;
-        console.log(`dec: ${bitPerCode}`);
-        totalCompressedBits += bitPerCode;
-        if (s !== undefined){
-            dict[idx] = s + entry[0];
-            insertDec(table, s, entry, index, idx, dict, leftDemarc, rightDemarc);
-            idx++;
-            if(idx>=thresh-1){
-                console.log(idx, thresh, entry);
-                bitPerCode++;
-                thresh <<= 1;
+    if(radix !== 2 || !useBitstream){
+        //get list of integers from string
+        var symbols = originalStr.split(/(?:,| )+/);
+        //regex to consider any amount of spaces or commas as one delimiter
+        var indices = [];
+        for (symbol of symbols){
+            if(symbol){ //avoid parsing empty strings (if delimiter is at end of string)
+                indices.push(parseInt(symbol, radix));
             }
         }
-        else{
-            insertDecFirst(table, s, entry, index, dict, leftDemarc, rightDemarc);
+        //decoding process
+        var s=undefined;
+        var entry=undefined;
+        for (var index of indices){
+            entry = dict[index];
+            if (entry === undefined){
+                entry = s + s[0];
+            }
+            //console.log(entry);
+            addToCounter(outputCounter, entry);
+            for(char of entry){
+                addToCounter(inputCounter, char);
+            }
+            numInputSym += entry.length;
+            addSpansDec(span, index, idx, spanCount, entry, p, p_dec, radix);
+            spanCount++;
+            //console.log(`dec: ${bitPerCode}`);
+            totalCompressedBits += bitPerCode;
+            if (s !== undefined){
+                dict[idx] = s + entry[0];
+                insertDec(table, s, entry, index, idx, dict, leftDemarc, rightDemarc);
+                if(idx>=thresh-2){
+                    //console.log(idx, thresh, entry);
+                    bitPerCode++;
+                    thresh <<= 1;
+                }
+                idx++;
+            }
+            else{
+                insertDecFirst(table, s, entry, index, dict, leftDemarc, rightDemarc);
+            }
+            s = entry;
         }
-        s = entry;
     }
-    
+    else{
+        var spacelessStr = originalStr.replace(/(?:,|\s)+/g, "");
+        console.log(spacelessStr);
+        //decoding process
+        var s=undefined;
+        var entry=undefined;
+        var done = false;
+        var ptr = 0;
+        var decoded = "";
+
+        while (ptr<spacelessStr.length){
+            var nextBin = spacelessStr.substr(ptr, bitPerCode);
+            var index = parseInt(nextBin, 2);
+            ptr += bitPerCode;
+            entry = dict[index];
+            if (entry === undefined){
+                entry = s + s[0];
+            }
+            addToCounter(outputCounter, entry);
+            for(char of entry){
+                addToCounter(inputCounter, char);
+            }
+            numInputSym += entry.length;
+            addSpansDecBit(span, index, idx, spanCount, entry, p, p_dec, nextBin);
+            spanCount++;
+            totalCompressedBits += bitPerCode;
+            decoded += entry;
+            if (s !== undefined){
+                dict[idx] = s + entry[0];
+                insertDec(table, s, entry, index, idx, dict, leftDemarc, rightDemarc);
+                if(idx>=thresh-2){
+                    //console.log(idx, thresh, entry);
+                    bitPerCode++;
+                    thresh <<= 1;
+                }
+                idx++;
+            }
+            else{
+                insertDecFirst(table, s, entry, index, dict, leftDemarc, rightDemarc);
+            }
+            s = entry;
+        }
+        //console.log(decoded);
+    }
         //hover events
     p.addEventListener('mouseenter', function(e){
         if (e.target && e.target.className == "output-highlight"){
             e.target.style.background = '#31f5f5';
-            let temp = e.target.innerHTML;
+            let temp = parseInt(e.target.innerHTML, radix).toString(10);
             var cell5 = document.getElementById(`idx-${temp}a`);
             var cell6 = document.getElementById(`idx-${temp}b`);
             span = document.getElementById(e.target.id + "-dec");
@@ -540,7 +618,7 @@ function decode(){
     p.addEventListener('mouseleave', function(e){
         if (e.target && e.target.className == "output-highlight"){
             e.target.style.background = '#ffffff';
-            let temp = e.target.innerHTML;
+            let temp = parseInt(e.target.innerHTML, radix).toString(10);
             var cell5 = document.getElementById(`idx-${temp}a`);
             var cell6 = document.getElementById(`idx-${temp}b`);
             span = document.getElementById(e.target.id + "-dec");
@@ -579,10 +657,52 @@ function addStats(numInputSym, spanCount, numStaticBits, totalCompressedBits, in
     document.getElementById("i-sps").innerHTML = "0%";
     document.getElementById("o-sps").innerHTML = `${((1 - totalCompressedBits/(numInputSym * numStaticBits)) * 100).toFixed(2)}%`;
 }
+function onRadixSel(e){
+    check = document.getElementById("use-bitstream");
+    if(e.value === "2"){
+        check.disabled = false;
+    }
+    else{
+        check.disabled = true;
+    }
+}
 function auto_height(elem) {  /* javascript */
     elem.style.height = "1px";
     elem.style.height = (elem.scrollHeight)+"px";
 }
 function hasWhiteSpace(s) {
     return s.indexOf(' ') >= 0;
+}
+function selectText1(containerid) {
+    //from stack overflow: https://stackoverflow.com/questions/24553251/is-it-possible-to-restrict-the-range-of-select-all-ctrla
+        if (document.selection) {
+            var range = document.body.createTextRange();
+            range.moveToElementText(document.getElementById(containerid));
+            range.select();
+        } else if (window.getSelection) {
+            var range = document.createRange();
+            range.selectNode(document.getElementById(containerid));
+            window.getSelection().addRange(range);
+        }
+    }
+$(document).keydown(function(e) {
+    if($("#decimal-output").is(":hover")){
+        if (e.keyCode == 65 && e.ctrlKey) {
+            selectText1('decimal-output');
+            e.preventDefault();
+        }
+    }
+});
+$("#decimal-output").keydown(function(e) {
+        if (e.keyCode == 65 && e.ctrlKey) {
+            selectText1("decimal-output");
+            e.preventDefault();
+        }
+});
+function copyToClipboard(element) { //https://codepen.io/shaikmaqsood/pen/XmydxJ
+  var $temp = $("<input>");
+  $("body").append($temp);
+  $temp.val($(element).text()).select();
+  document.execCommand("copy");
+  $temp.remove();
 }
