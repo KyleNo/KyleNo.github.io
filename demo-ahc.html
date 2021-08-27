@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <base href=".">
+        <meta name="viewport" content="with=device-width, initial-scale=1.0" charset="UTF-8">
+        <title>Adaptive Huffman Coding</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=MonteCarlo&display=swap" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/6d6b6b0664.js" crossorigin="anonymous"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    </head>
+    <body onload="hideCustomDefault()">
+        <section class="small-demo-header">
+            <nav>
+                <a href="index.html">Kyle Noble</a>
+                <div class="nav-links" id="navLinks">
+                    <i class="far fa-times-circle" onclick="hideMenu()"></i>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="projects.html">Projects</a></li>
+                        <li><a href="demos.html">Demos</a></li>
+                        <li><a href="about.html">About Me</a></li>
+                    </ul>
+                </div>
+                <i class="fas fa-bars" onclick="showMenu()"></i>
+            </nav>
+            <div class="sub-text">
+                <h1>Adaptive Huffman Coding</h1>
+            </div>
+        </section>
+        
+        <section>
+            
+        </section>
+        
+        <section class="demo-ahc">
+            <canvas id="ahc-canvas" width="1500" height="800"></canvas>
+        </section>
+
+        
+
+        
+        
+        <!---  Footer  --->
+        
+        <section class="footer">
+            <h4>Contact</h4>
+            <p>Contact information can be found linked below.</p>
+            <div class="demo-icons">
+                <a href="https://www.linkedin.com/in/kyle-n-noble/"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://github.com/KyleNo"><i class="fab fa-github"></i></a>
+            </div>
+            <p>Website created by Kyle Noble.</p>
+        </section>
+        
+        <!--- JavaScript for Mobile Menu Toggle --->
+        <script>
+            var navLinks = document.getElementById("navLinks");
+            
+            function showMenu(){
+                navLinks.style.right = "0";
+            }
+            function hideMenu(){
+                navLinks.style.right = "-200px";
+            }
+        </script>
+        <script src="scripts/ahc.js"></script>
+    </body>
+</html>
