@@ -1,10 +1,23 @@
-const maxDictSize = 4096;
-var lastRadix = 10;
+/*  Code for lzw demo for kylenoble.net
+*   Author: Kyle Noble
+*   Last Modified: 8/27/2021
+*/
+
+// Maximum size of dictionary: Number of unique entries that can
+// exist in the dictionary, including the original dictionary.
+// This is traditionally set to 2^12 so the code lengths don't exceed
+// 12 bits
+const maxDictSize = 4096; //2^12
+// Operation to be completed when encode button is pressed.
+// Takes input data as a string and passes through it to build
+// a dictionary of previously encountered substrings.
+// These new substrings are given unique codes which don't
+// overlap with those of the original dictionary (which contains
+// only single characters)
 function encode(){
     var inputText = document.getElementById("input-str");
     let originalStr = inputText.value;
     let numInputSym = originalStr.length;
-    let tab = document.getElementById("lzw-tab");
     let table = document.getElementById("lzw-tab").getElementsByTagName('tbody')[0];
     let p = document.getElementById("enc-output");
     let p_dec = document.getElementById("decimal-output");
@@ -15,7 +28,6 @@ function encode(){
     let demarkSel = document.getElementById("str-mark-select").value;
     
     let radix = parseInt(document.getElementById("radix-sel").value, 10);
-    lastRadix = radix;
     let useBitstream = document.getElementById("use-bitstream").checked;
     
     //let textArea = document.getElementsByClassName("auto_height")[0];
@@ -29,7 +41,7 @@ function encode(){
     //build dictionary of single chars
     var dict = {};
     customDict = (dictSel === "custom") ? document.getElementById("custom-dict").value : "";
-    let idx = buildDict(dict, dictSel, customDict);
+    let idx = buildDictEnc(dict, dictSel, customDict);
     
     if(dictSel === "A-Z" || dictSel === "an"){
         originalStr = originalStr.toUpperCase();
@@ -37,11 +49,9 @@ function encode(){
     
     //get the size of initial dictionary for statistics
     let dSize = idx-1;
-    //console.log(dSize);
     
     //entry number which requires increasing bit width
     let bitPerCode = Math.ceil(Math.log2(dSize))+1;
-    //console.log(bitPerCode);
     let thresh = Math.pow(2, bitPerCode);
     let totalCompressedBits = 0;
     
@@ -72,7 +82,6 @@ function encode(){
                 p_dec.insertAdjacentHTML('beforeend', " ");
             }
             spanCount ++;
-            console.log(`enc: ${bitPerCode}`);
             totalCompressedBits += bitPerCode;
             
             //only add to dictionary if within max size
@@ -82,7 +91,6 @@ function encode(){
 
                 //update bitPerCode and threshhold if necessary
                 if(idx>=thresh-1){
-                    console.log(idx, thresh, s);
                     bitPerCode++;
                     thresh <<= 1;
                 }
@@ -143,146 +151,159 @@ function encode(){
     
     inputText.style.height = "40px";
 }
+// A counter object tracks the number of occurences of each
+// unique, hashable key. 
 function addToCounter(c, k){ //c=counter object, k=key
     if(c[k] === undefined)
         c[k] = 1;
     else
         c[k]++;
 }
-function buildDict(d, sel, custom){
+// Builds the dictionary for the encoder. For this dictionary (Javascript object)
+// the key is the character and the value at that key is an index
+// which counts up from 0 to the size of the desired initial dictionary.
+function buildDictEnc(d, sel, custom){
     var idx = 0;
-    if(sel === "ASCII"){
-        for (idx = 0; idx < 128; idx++){
-            d[String.fromCharCode(idx)] = idx;
-        }
-    }
-    else if(sel === "UTF-8"){
-        for (idx = 0; idx < 256; idx++){
-            d[String.fromCharCode(idx)] = idx;
-        }
-    }
-    else if(sel === "A-Z"){
-        for (idx = 0; idx < 26; idx++){
-            d[String.fromCharCode(idx+65)] = idx;
-        }
-    }
-    else if(sel === "0-9"){
-        for (idx = 0; idx < 10; idx++){
-            d[String.fromCharCode(idx+48)] = idx;
-        }
-    }
-    else if(sel === "an"){
-        for (idx = 0; idx < 10; idx++){
-            d[String.fromCharCode(idx+48)] = idx;
-        }
-        for (; idx < 26+10; idx++){
-            d[String.fromCharCode(idx+65-10)] = idx;
-        }
-    }
-    else if(sel === "csan"){
-        for (idx = 0; idx < 10; idx++){
-            d[String.fromCharCode(idx+48)] = idx;
-        }
-        for (; idx < 26+10; idx++){
-            d[String.fromCharCode(idx+65-10)] = idx;
-        }
-        for (; idx < 26+10+26; idx++){
-            d[String.fromCharCode(idx+97-10-26)] = idx;
-        }
-    }
-    else if(sel === "csanp"){
-        for (idx = 0; idx < 10; idx++){
-            d[String.fromCharCode(idx+48)] = idx;
-        }
-        for (; idx < 26+10; idx++){
-            d[String.fromCharCode(idx+65-10)] = idx;
-        }
-        for (; idx < 26+10+26; idx++){
-            d[String.fromCharCode(idx+97-10-26)] = idx;
-        }
-        for (var c of " ,.?!"){
-            d[c] = idx;
-            idx++;
-        }
-    }
-    else if(sel === "custom"){
-        idx = 0;
-        for (var c of custom){
-            if (d[c] === undefined){
+    switch(sel){
+        case "ASCII":
+            for (idx = 0; idx < 128; idx++){
+                d[String.fromCharCode(idx)] = idx;
+            }
+            break;
+        case "UTF-8":
+            for (idx = 0; idx < 256; idx++){
+                d[String.fromCharCode(idx)] = idx;
+            }
+            break;
+        case "A-Z":
+            for (idx = 0; idx < 26; idx++){
+                d[String.fromCharCode(idx+65)] = idx;
+            }
+            break;
+        case "0-9":
+            for (idx = 0; idx < 10; idx++){
+                d[String.fromCharCode(idx+48)] = idx;
+            }
+            break;
+        case "an":
+            for (idx = 0; idx < 10; idx++){
+                d[String.fromCharCode(idx+48)] = idx;
+            }
+            for (; idx < 26+10; idx++){
+                d[String.fromCharCode(idx+65-10)] = idx;
+            }
+            break;
+        case "csan":
+            for (idx = 0; idx < 10; idx++){
+                d[String.fromCharCode(idx+48)] = idx;
+            }
+            for (; idx < 26+10; idx++){
+                d[String.fromCharCode(idx+65-10)] = idx;
+            }
+            for (; idx < 26+10+26; idx++){
+                d[String.fromCharCode(idx+97-10-26)] = idx;
+            }
+            break;
+        case "csanp":
+            for (idx = 0; idx < 10; idx++){
+                d[String.fromCharCode(idx+48)] = idx;
+            }
+            for (; idx < 26+10; idx++){
+                d[String.fromCharCode(idx+65-10)] = idx;
+            }
+            for (; idx < 26+10+26; idx++){
+                d[String.fromCharCode(idx+97-10-26)] = idx;
+            }
+            for (var c of " ,.?!"){
                 d[c] = idx;
                 idx++;
             }
-        }
+            break;
+        case "custom":
+            idx = 0;
+            for (var c of custom){
+                if (d[c] === undefined){
+                    d[c] = idx;
+                    idx++;
+                }
+            }
+            break;
     }
     return idx;
 }
+// Builds the dictionary for the decoder. For this dictionary,
+// the key is the index and the value is the character.
 function buildDictDec(d, sel, custom){
     var idx = 0;
-    if(sel === "ASCII"){
-        for (idx = 0; idx < 128; idx++){
-            d[idx] = String.fromCharCode(idx);
-        }
-    }
-    else if(sel === "UTF-8"){
-        for (idx = 0; idx < 256; idx++){
-            d[idx] = String.fromCharCode(idx);
-        }
-    }
-    else if(sel === "A-Z"){
-        for (idx = 0; idx < 26; idx++){
-            d[idx] = String.fromCharCode(idx+65);
-        }
-    }
-    else if(sel === "0-9"){
-        for (idx = 0; idx < 10; idx++){
-            d[idx] = String.fromCharCode(idx+48);
-        }
-    }
-    else if(sel === "an"){
-        for (idx = 0; idx < 10; idx++){
-            d[idx] = String.fromCharCode(idx+48);
-        }
-        for (; idx < 26+10; idx++){
-            d[idx] = String.fromCharCode(idx+65-10);
-        }
-    }
-    else if(sel === "csan"){
-        for (idx = 0; idx < 10; idx++){
-            d[idx] = String.fromCharCode(idx+48);
-        }
-        for (; idx < 26+10; idx++){
-            d[idx] = String.fromCharCode(idx+65-10);
-        }
-        for (; idx < 26+10+26; idx++){
-            d[idx] = String.fromCharCode(idx+97-10-26);
-        }
-    }
-    else if(sel === "csanp"){
-        for (idx = 0; idx < 10; idx++){
-            d[idx] = String.fromCharCode(idx+48);
-        }
-        for (; idx < 26+10; idx++){
-            d[idx] = String.fromCharCode(idx+65-10);
-        }
-        for (; idx < 26+10+26; idx++){
-            d[idx] = String.fromCharCode(idx+97-10-26);
-        }
-        for (var c of " ,.?!"){
-            d[idx] = c;
-            idx++;
-        }
-    }
-    else if(sel === "custom"){
-        idx = 0;
-        for (var c of custom){
-            if (d[idx] === undefined){
+    switch(sel){
+        case "ASCII":
+            for (idx = 0; idx < 128; idx++){
+                d[idx] = String.fromCharCode(idx);
+            }
+            break;
+        case "UTF-8":
+            for (idx = 0; idx < 256; idx++){
+                d[idx] = String.fromCharCode(idx);
+            }
+            break;
+        case "A-Z":
+            for (idx = 0; idx < 26; idx++){
+                d[idx] = String.fromCharCode(idx+65);
+            }
+            break;
+        case "0-9":
+            for (idx = 0; idx < 10; idx++){
+                d[idx] = String.fromCharCode(idx+48);
+            }
+            break;
+        case "an":
+            for (idx = 0; idx < 10; idx++){
+                d[idx] = String.fromCharCode(idx+48);
+            }
+            for (; idx < 26+10; idx++){
+                d[idx] = String.fromCharCode(idx+65-10);
+            }
+            break;
+        case "csan":
+            for (idx = 0; idx < 10; idx++){
+                d[idx] = String.fromCharCode(idx+48);
+            }
+            for (; idx < 26+10; idx++){
+                d[idx] = String.fromCharCode(idx+65-10);
+            }
+            for (; idx < 26+10+26; idx++){
+                d[idx] = String.fromCharCode(idx+97-10-26);
+            }
+            break;
+        case "csanp":
+            for (idx = 0; idx < 10; idx++){
+                d[idx] = String.fromCharCode(idx+48);
+            }
+            for (; idx < 26+10; idx++){
+                d[idx] = String.fromCharCode(idx+65-10);
+            }
+            for (; idx < 26+10+26; idx++){
+                d[idx] = String.fromCharCode(idx+97-10-26);
+            }
+            for (var c of " ,.?!"){
                 d[idx] = c;
                 idx++;
             }
-        }
+            break;
+        case "custom":
+            idx = 0;
+            for (var c of custom){
+                if (d[idx] === undefined){
+                    d[idx] = c;
+                    idx++;
+                }
+            }
+            break;
     }
     return idx;
 }
+// Will replace these functions with single generalized function later...
+// For now: each fills in certain information into the table
 function insertRowNoOutput(table, s, c, l, r){
     var row = table.insertRow(-1);
     var cell1 = row.insertCell(0);
@@ -377,6 +398,7 @@ function insertDec(table, s, entry, index, i, dict, l, r){
     cell5.innerHTML = `${i}`;
     cell6.innerHTML = l+s+entry[0]+r;
 }
+// Adds both the sequence mapping and output text when encoding
 function addSpans(span, s, spanCount, dict, p, p_dec, radix, bitPerCode, useBitstream){
     span = document.createElement("span");
     span.innerHTML = s;
@@ -396,6 +418,7 @@ function addSpans(span, s, spanCount, dict, p, p_dec, radix, bitPerCode, useBits
     span.id = `span-${spanCount}-dec`;
     p_dec.appendChild(span);
 }
+// Adds the sequence mapping and output text when decoding
 function addSpansDec(span, index, idx, spanCount, entry, p, p_dec, radix){
     span = document.createElement("span");
     span.innerHTML = index.toString(radix);
@@ -408,6 +431,7 @@ function addSpansDec(span, index, idx, spanCount, entry, p, p_dec, radix){
     span.id = `span-${spanCount}-dec`;
     p_dec.appendChild(span);
 }
+// Special case for when decoder is using binary bitstream
 function addSpansDecBit(span, index, idx, spanCount, entry, p, p_dec, bin_num){
     span = document.createElement("span");
     span.innerHTML = bin_num;
@@ -420,6 +444,8 @@ function addSpansDecBit(span, index, idx, spanCount, entry, p, p_dec, bin_num){
     span.id = `span-${spanCount}-dec`;
     p_dec.appendChild(span);
 }
+// Uses the counter objects to determine entropy
+// see here: https://en.wikipedia.org/wiki/Entropy_(information_theory)
 function calcEntropy(c, n){ //c = counterobject, n = number of symbols
     sum = 0.0;
     for (var key in c){
@@ -428,12 +454,14 @@ function calcEntropy(c, n){ //c = counterobject, n = number of symbols
     }
     return sum;
 }
-function hideCustomDefault(){
+// On load, check if certain elements should be hidden
+function onPageLoad(){
     e = document.getElementById("dict-select");
     c = document.getElementById("radix-sel");
     onDictSel(e);
     onRadixSel(c);
 }
+// Check if custom dictionary textbox should be loaded
 function onDictSel(e){
     div = document.getElementById("custom-dict-box");
     if (e.value === "custom") {
@@ -443,6 +471,7 @@ function onDictSel(e){
         div.style.display = "none";
     }
 }
+// Returns demarcation characters
 function getLeftDemarc(s){
     switch(s){
         case "none":    return "";
@@ -461,6 +490,10 @@ function getRightDemarc(s){
         case "aquo":    return `&raquo`;
     }
 }
+// Operation to be completed when decode button is pressed.
+// Collects the input string, builds a dictionary,
+// decodes input, displays table and output, and calculates
+// some metrics
 function decode(){
     var inputText = document.getElementById("input-str");
     let originalStr = inputText.value;
@@ -475,9 +508,7 @@ function decode(){
     let demarkSel = document.getElementById("str-mark-select").value;
     
     let radix = parseInt(document.getElementById("radix-sel").value, 10);
-    lastRadix = radix;
     let useBitstream = document.getElementById("use-bitstream").checked;
-    console.log(useBitstream);
     
     //let textArea = document.getElementsByClassName("auto_height")[0];
     //clear original table
@@ -497,7 +528,6 @@ function decode(){
     
     //entry number which requires increasing bit width
     let bitPerCode = Math.ceil(Math.log2(dSize))+1;
-    //console.log(bitPerCode);
     let thresh = Math.pow(2, bitPerCode);
     let totalCompressedBits = 0;
     
@@ -528,7 +558,6 @@ function decode(){
             if (entry === undefined){
                 entry = s + s[0];
             }
-            //console.log(entry);
             addToCounter(outputCounter, entry);
             for(char of entry){
                 addToCounter(inputCounter, char);
@@ -536,13 +565,11 @@ function decode(){
             numInputSym += entry.length;
             addSpansDec(span, index, idx, spanCount, entry, p, p_dec, radix);
             spanCount++;
-            //console.log(`dec: ${bitPerCode}`);
             totalCompressedBits += bitPerCode;
             if (s !== undefined){
                 dict[idx] = s + entry[0];
                 insertDec(table, s, entry, index, idx, dict, leftDemarc, rightDemarc);
                 if(idx>=thresh-2){
-                    //console.log(idx, thresh, entry);
                     bitPerCode++;
                     thresh <<= 1;
                 }
@@ -555,8 +582,8 @@ function decode(){
         }
     }
     else{
+        //remove all whitespace and commas
         var spacelessStr = originalStr.replace(/(?:,|\s)+/g, "");
-        console.log(spacelessStr);
         //decoding process
         var s=undefined;
         var entry=undefined;
@@ -585,7 +612,6 @@ function decode(){
                 dict[idx] = s + entry[0];
                 insertDec(table, s, entry, index, idx, dict, leftDemarc, rightDemarc);
                 if(idx>=thresh-2){
-                    //console.log(idx, thresh, entry);
                     bitPerCode++;
                     thresh <<= 1;
                 }
@@ -596,7 +622,6 @@ function decode(){
             }
             s = entry;
         }
-        //console.log(decoded);
     }
         //hover events
     p.addEventListener('mouseenter', function(e){
@@ -637,6 +662,7 @@ function decode(){
     
     inputText.style.height = "40px";
 }
+// Calculates some statistics about the input data and compression results
 function addStats(numInputSym, spanCount, numStaticBits, totalCompressedBits, inputCounter, outputCounter){
     //Enter statistics into table
     document.getElementById("i-num").innerHTML = `${numInputSym}`;
@@ -657,6 +683,7 @@ function addStats(numInputSym, spanCount, numStaticBits, totalCompressedBits, in
     document.getElementById("i-sps").innerHTML = "0%";
     document.getElementById("o-sps").innerHTML = `${((1 - totalCompressedBits/(numInputSym * numStaticBits)) * 100).toFixed(2)}%`;
 }
+// Enables/Disables bitstream button depending on whether binary is selected
 function onRadixSel(e){
     check = document.getElementById("use-bitstream");
     if(e.value === "2"){
@@ -666,13 +693,16 @@ function onRadixSel(e){
         check.disabled = true;
     }
 }
-function auto_height(elem) {  /* javascript */
+// From stackoverflow, simple function which allows textbox to expand as necessary
+function auto_height(elem) {
     elem.style.height = "1px";
     elem.style.height = (elem.scrollHeight)+"px";
 }
+// Checks whether a string contains whitespace
 function hasWhiteSpace(s) {
     return s.indexOf(' ') >= 0;
 }
+// Select everything in a container
 function selectText1(containerid) {
     //from stack overflow: https://stackoverflow.com/questions/24553251/is-it-possible-to-restrict-the-range-of-select-all-ctrla
         if (document.selection) {
@@ -685,6 +715,7 @@ function selectText1(containerid) {
             window.getSelection().addRange(range);
         }
     }
+// If hovering over output container, ctrl+a selects all text in container.
 $(document).keydown(function(e) {
     if($("#decimal-output").is(":hover")){
         if (e.keyCode == 65 && e.ctrlKey) {
@@ -699,6 +730,7 @@ $("#decimal-output").keydown(function(e) {
             e.preventDefault();
         }
 });
+// Copy text to clipboard
 function copyToClipboard(element) { //https://codepen.io/shaikmaqsood/pen/XmydxJ
   var $temp = $("<input>");
   $("body").append($temp);
