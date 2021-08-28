@@ -492,13 +492,18 @@ function decode(){
             spanCount++;
             totalCompressedBits += bitPerCode;
             if (s !== undefined){
-                dict[idx] = s + entry[0];
-                insertRow(table, l+s+r, l+entry[0]+r, l+entry+r, index, idx, l+s+entry[0]+r, idx);
-                if(idx>=thresh-2){
-                    bitPerCode++;
-                    thresh <<= 1;
+                if(idx<maxDictSize){
+                    dict[idx] = s + entry[0];
+                    insertRow(table, l+s+r, l+entry[0]+r, l+entry+r, index, idx, l+s+entry[0]+r, idx);
+                    if(idx>=thresh-2){
+                        bitPerCode++;
+                        thresh <<= 1;
+                    }
+                    idx++;
                 }
-                idx++;
+                else{
+                    insertRow(table, l+s+r, l+entry[0]+r, l+entry+r, index, "", "", "");
+                }
             }
             else{
                 insertRow(table, "undefined", l+entry[0]+r, l+entry+r, index, "", "", "");
@@ -534,13 +539,18 @@ function decode(){
             totalCompressedBits += bitPerCode;
             decoded += entry;
             if (s !== undefined){
-                dict[idx] = s + entry[0];
-                insertRow(table, l+s+r, l+entry[0]+r, l+entry+r, index, idx, l+s+entry[0]+r, idx);
-                if(idx>=thresh-2){
-                    bitPerCode++;
-                    thresh <<= 1;
+                if(idx<maxDictSize){
+                    dict[idx] = s + entry[0];
+                    insertRow(table, l+s+r, l+entry[0]+r, l+entry+r, index, idx, l+s+entry[0]+r, idx);
+                    if(idx>=thresh-2){
+                        bitPerCode++;
+                        thresh <<= 1;
+                    }
+                    idx++;
                 }
-                idx++;
+                else{
+                    insertRow(table, l+s+r, l+entry[0]+r, l+entry+r, index, "", "", "");
+                }
             }
             else{
                 insertRow(table, "undefined", l+entry[0]+r, l+entry+r, index, "", "", "");
