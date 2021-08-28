@@ -60,8 +60,8 @@ function encode(){
     var outputCounter = {};
     
     //set demarcation symbols
-    var leftDemarc = getLeftDemarc(demarkSel);
-    var rightDemarc = getRightDemarc(demarkSel);
+    var l = getLeftDemarc(demarkSel);
+    var r = getRightDemarc(demarkSel);
     
     s = originalStr[0];
     addToCounter(inputCounter, s);
@@ -69,7 +69,7 @@ function encode(){
         c = originalStr[i];
         addToCounter(inputCounter, c);
         if(dict[s+c] !== undefined){
-            insertRowNoOutput(table, s, c, leftDemarc, rightDemarc);
+            insertRow(table, l+s+r, l+c+r, "", "", "", "", "");
             s = s+c;
         }
         else{
@@ -86,8 +86,7 @@ function encode(){
             
             //only add to dictionary if within max size
             if(idx < maxDictSize){
-                //output s into table and add dictionary index for new sequence
-                insertRowWithOutput(table, s, c, dict, idx, leftDemarc, rightDemarc);
+                insertRow(table, l+s+r, l+c+r, l+s+r, dict[s], idx, l+s+c+r, idx);
 
                 //update bitPerCode and threshhold if necessary
                 if(idx>=thresh-1){
@@ -99,7 +98,7 @@ function encode(){
                 idx ++;
             }
             else{
-                insertRowNoDict(table, s, c, dict, idx, leftDemarc, rightDemarc);
+                insertRow(table, l+s+r, l+c+r, l+s+r, dict[s], "", "", "");
             }
             s = c;
         }
@@ -110,7 +109,8 @@ function encode(){
     addSpans(span, s, spanCount, dict, p, p_dec, radix, bitPerCode, useBitstream);
     spanCount ++;
     totalCompressedBits += bitPerCode;
-    insertEOF(table, s, dict, leftDemarc, rightDemarc);
+    //insertEOF(table, s, dict, leftDemarc, rightDemarc);
+    insertRow(table, l+s+r, "EOF", l+s+r, dict[s], "", "", "");
     
     //hover events
     p.addEventListener('mouseenter', function(e){
@@ -302,9 +302,8 @@ function buildDictDec(d, sel, custom){
     }
     return idx;
 }
-// Will replace these functions with single generalized function later...
-// For now: each fills in certain information into the table
-function insertRowNoOutput(table, s, c, l, r){
+// append a row to the end of the table with strings t1, ..., t6 and an optional identifier number
+function insertRow(table, t1, t2, t3, t4, t5, t6, id){
     var row = table.insertRow(-1);
     var cell1 = row.insertCell(0);
     var cell2 = row.insertCell(1);
@@ -312,92 +311,18 @@ function insertRowNoOutput(table, s, c, l, r){
     var cell4 = row.insertCell(3);
     var cell5 = row.insertCell(4);
     var cell6 = row.insertCell(5);
-    cell1.innerHTML = l+s+r;
-    cell2.innerHTML = l+c+r;
-    cell3.innerHTML = "";
-    cell4.innerHTML = "";
-    cell5.innerHTML = "";
-    cell6.innerHTML = "";
+    cell1.innerHTML = t1;
+    cell2.innerHTML = t2;
+    cell3.innerHTML = t3;
+    cell4.innerHTML = t4;
+    cell5.innerHTML = t5;
+    cell6.innerHTML = t6;
+    if(id){
+        cell5.id = `idx-${id}a`;
+        cell6.id = `idx-${id}b`;
+    }
 }
-function insertRowWithOutput(table, s, c, dict, idx, l, r){
-    var row = table.insertRow(-1);
-    var cell1 = row.insertCell(0);
-    var cell2 = row.insertCell(1);
-    var cell3 = row.insertCell(2);
-    var cell4 = row.insertCell(3);
-    var cell5 = row.insertCell(4);
-    var cell6 = row.insertCell(5);
-    cell5.id = `idx-${idx}a`;
-    cell6.id = `idx-${idx}b`;
-    cell1.innerHTML = l+s+r;
-    cell2.innerHTML = l+c+r;
-    cell3.innerHTML = l+s+r;
-    cell4.innerHTML = `${dict[s]}`;
-    cell5.innerHTML = `${idx}`;
-    cell6.innerHTML = l+s+c+r;
-}
-function insertRowNoDict(table, s, c, dict, idx, l, r){
-    var row = table.insertRow(-1);
-    var cell1 = row.insertCell(0);
-    var cell2 = row.insertCell(1);
-    var cell3 = row.insertCell(2);
-    var cell4 = row.insertCell(3);
-    var cell5 = row.insertCell(4);
-    var cell6 = row.insertCell(5);
-    cell1.innerHTML = l+s+r;
-    cell2.innerHTML = l+c+r;
-    cell3.innerHTML = l+s+r;
-    cell4.innerHTML = `${dict[s]}`;
-    cell5.innerHTML = "";
-    cell6.innerHTML = "";
-}
-function insertEOF(table, s, dict, l, r){
-    var row = table.insertRow(-1);
-    var cell1 = row.insertCell(0);
-    var cell2 = row.insertCell(1);
-    var cell3 = row.insertCell(2);
-    var cell4 = row.insertCell(3);
-    var cell5 = row.insertCell(4);
-    var cell6 = row.insertCell(5);
-    cell1.innerHTML = l+s+r;
-    cell2.innerHTML = "EOF";
-    cell3.innerHTML = l+s+r;
-    cell4.innerHTML = `${dict[s]}`;
-    cell5.innerHTML = "";
-    cell6.innerHTML = "";
-}
-function insertDecFirst(table, s, entry, index, dict, l, r){
-    var row = table.insertRow(-1);
-    var cell1 = row.insertCell(0);
-    var cell2 = row.insertCell(1);
-    var cell3 = row.insertCell(2);
-    var cell4 = row.insertCell(3);
-    var cell5 = row.insertCell(4);
-    var cell6 = row.insertCell(5);
-    cell1.innerHTML = "undefined";
-    cell2.innerHTML = l+entry[0]+r;
-    cell3.innerHTML = l+entry+r;
-    cell4.innerHTML = index;
-    cell5.innerHTML = "";
-    cell6.innerHTML = "";
-}
-function insertDec(table, s, entry, index, i, dict, l, r){
-    var row = table.insertRow(-1);
-    var cell1 = row.insertCell(0);
-    var cell2 = row.insertCell(1);
-    var cell3 = row.insertCell(2);
-    var cell4 = row.insertCell(3);
-    var cell5 = row.insertCell(4);
-    var cell6 = row.insertCell(5);
-    cell5.id = `idx-${i}a`;
-    cell6.id = `idx-${i}b`;
-    cell1.innerHTML = l+s+r;
-    cell2.innerHTML = l+entry[0]+r;
-    cell3.innerHTML = l+entry+r;
-    cell4.innerHTML = index;
-    cell5.innerHTML = `${i}`;
-    cell6.innerHTML = l+s+entry[0]+r;
-}
+
 // Adds both the sequence mapping and output text when encoding
 function addSpans(span, s, spanCount, dict, p, p_dec, radix, bitPerCode, useBitstream){
     span = document.createElement("span");
@@ -444,7 +369,7 @@ function addSpansDecBit(span, index, idx, spanCount, entry, p, p_dec, bin_num){
     span.id = `span-${spanCount}-dec`;
     p_dec.appendChild(span);
 }
-// Uses the counter objects to determine entropy
+// Uses the counter objects to determine entropy. Similar to python's collections.Counter
 // see here: https://en.wikipedia.org/wiki/Entropy_(information_theory)
 function calcEntropy(c, n){ //c = counterobject, n = number of symbols
     sum = 0.0;
@@ -537,8 +462,8 @@ function decode(){
     var numInputSym = 0;
     
     //set demarcation symbols
-    var leftDemarc = getLeftDemarc(demarkSel);
-    var rightDemarc = getRightDemarc(demarkSel);
+    var l = getLeftDemarc(demarkSel);
+    var r = getRightDemarc(demarkSel);
     
     if(radix !== 2 || !useBitstream){
         //get list of integers from string
@@ -568,7 +493,7 @@ function decode(){
             totalCompressedBits += bitPerCode;
             if (s !== undefined){
                 dict[idx] = s + entry[0];
-                insertDec(table, s, entry, index, idx, dict, leftDemarc, rightDemarc);
+                insertRow(table, l+s+r, l+entry[0]+r, l+entry+r, index, idx, l+s+entry[0]+r, idx);
                 if(idx>=thresh-2){
                     bitPerCode++;
                     thresh <<= 1;
@@ -576,7 +501,7 @@ function decode(){
                 idx++;
             }
             else{
-                insertDecFirst(table, s, entry, index, dict, leftDemarc, rightDemarc);
+                insertRow(table, "undefined", l+entry[0]+r, l+entry+r, index, "", "", "");
             }
             s = entry;
         }
@@ -610,7 +535,7 @@ function decode(){
             decoded += entry;
             if (s !== undefined){
                 dict[idx] = s + entry[0];
-                insertDec(table, s, entry, index, idx, dict, leftDemarc, rightDemarc);
+                insertRow(table, l+s+r, l+entry[0]+r, l+entry+r, index, idx, l+s+entry[0]+r, idx);
                 if(idx>=thresh-2){
                     bitPerCode++;
                     thresh <<= 1;
@@ -618,7 +543,7 @@ function decode(){
                 idx++;
             }
             else{
-                insertDecFirst(table, s, entry, index, dict, leftDemarc, rightDemarc);
+                insertRow(table, "undefined", l+entry[0]+r, l+entry+r, index, "", "", "");
             }
             s = entry;
         }
