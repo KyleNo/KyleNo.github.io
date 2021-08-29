@@ -702,3 +702,10 @@ code{
 sup{
     line-height: 0;
 }
+.demo-ahc{
+    text-align: center;
+}
+.demo-ahc canvas{
+    display: block;
+    margin: auto;
+}
