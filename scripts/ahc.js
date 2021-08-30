@@ -2,7 +2,7 @@ let c = document.getElementById("ahc-canvas");
 const WIDTH = c.width;
 const HEIGHT = c.height;
 const nyt = "NYT";
-var global_tree;
+//var global_tree;
 //simple queue implementation
 class QueueNode{
     constructor(val){
@@ -59,6 +59,7 @@ class Queue{
         return (this.front == null);
     }
 }
+// Tree nodes
 class Node{
     constructor(parent, symbol){
         this.left = null;
@@ -68,6 +69,7 @@ class Node{
         this.weight = 0;
     }
 }
+// A binary tree which is used to encode symbols
 class Tree{
     constructor(){
         this.root = new Node(null, nyt);
@@ -75,25 +77,27 @@ class Tree{
         this.weight_sum = 0; //sum of all weights
         this.nodes = {}; //dictionary to track and find symbols which exist in tree
         this.nodes[nyt] = this.root;
-        this.fixed = {};
-        this.orderedNodes = [];
-        this.swapCount = 0;
+        this.fixed = {}; //dictionary of fixed length codes
+        this.orderedNodes = []; //a list of nodes in reverse level order
+        this.swapCount = 0; //tracks times swapped in single update attempt. Prevented infinite loops while debugging, no longer used
     }
     init(nSym){
-        const bits = Math.ceil(Math.log2(nSym));
+        const bits = Math.ceil(Math.log2(nSym)); // how many bits are needed to represent each symbol
         for (var i=0; i<nSym; i++){
-            var binString = i.toString(2);
-            this.fixed[String.fromCharCode(i)] = "0".repeat(bits-binString.length) + binString;
+            var binString = i.toString(2); //get binary string for each symbol
+            this.fixed[String.fromCharCode(i)] = "0".repeat(bits-binString.length) + binString; //prefix shorter codes with zero
         }
     }
+    //swap two non-root nodes on the tree
     swap(n1, n2){//n1, n2 CANNOT be root
         if(n1 === this.root || n2 === this.root){
-            console.log("Error: tried to swap root");
+            console.log("Error: tried to swap root"); //This should be unreachable
             return;
         }
         var temp = n1;
         var p1 = n1.parent;
         var p2 = n2.parent;
+        //swap child pointers of parents
         if(n1.parent.right === n1){
             n1.parent.right = n2;
         }
@@ -112,9 +116,12 @@ class Tree{
         else{
             console.log("swap error");
         }
+        //swap parent pointers of children
         n2.parent = p1;
         n1.parent = p2;
     }
+    // Find path from root to symbol node
+    // left = 0, right = 1
     getPath(node){
         var path = "";
         var bit;
@@ -127,14 +134,16 @@ class Tree{
         }
         return path;
     }
+    // Get code for character
     encodeSymbol(c){
-        if(this.nodes[c] === undefined){
+        if(this.nodes[c] === undefined){ //character has not been transferred before
             return this.getPath(this.nodes[nyt]) + this.fixed[c];
         }
         else{
             return this.getPath(this.nodes[c]);
         }
     }
+    //update the weight counts of non-leaf nodes
     recountWeights(node){
         //Once any tree node gets swapped, need to update the weights.
         var l = 0;
@@ -153,6 +162,11 @@ class Tree{
             return node.weight;
         }
     }
+    //Main update sequence
+    //1. Add new nodes if necessary
+    //2. Increment affected node weights
+    //3. Check if sibling property is violated
+    //4. If violated, swap nodes and return to 3.
     update(c){
         var node = this.nodes[c];
         if(node === undefined){ //if new char, add new node
@@ -232,9 +246,8 @@ class Tree{
                 }
             }
         }
-        
-
     }
+    //print the tree in right to left level order
     print(){
         var output = "";
         var q = new Queue();
@@ -249,18 +262,21 @@ class Tree{
                 q.enqueue(node.left);
             }
         }
+        /*
         console.log(output);
         for (const [key, value] of Object.entries(this.nodes)) {
             console.log(`${key}: ${value.weight}`);
         }
-        
+        */
     }
+    //print what was last recorded to be right to left level order
     printLevel(){
         console.log("Nodes in level order");
         for(const n of this.orderedNodes){
             console.log(n.symbol, n.weight);
         }
     }
+    //recursively draw the tree nodes to the canvas
     draw(node, x, y, scale){
         const radius = 22;
         const yOffset = 100;
@@ -290,16 +306,17 @@ class Tree{
             this.draw(node.right, x+scale/2, y+yOffset, scale/2);
         }
     }
+    //clear the canvas.
     clear(){
         var ctx = c.getContext("2d");
         ctx.clearRect(0,0,WIDTH,HEIGHT);
     }
 }
-
+//encode text on various events
 $("#ahc-input").on("change keyup paste", function(){
     encodeStr(document.getElementById("ahc-input"));
 })
-
+// fill output box
 function displayCode(code){
     const p = document.getElementById("ahc-output");
     if(p.innerHTML === ""){
@@ -309,16 +326,17 @@ function displayCode(code){
         p.innerHTML += " " + code;
     }
 }
+// clear output box
 function clearCode(){
     const p = document.getElementById("ahc-output");
     p.innerHTML = "";
 }
-
+// Encode the string in the given element.
 function encodeStr(e){
     const str = e.value;
     nSym = 256;
     var tree = new Tree();
-    global_tree = tree;
+    //global_tree = tree; //debugging shortcut
     tree.init(nSym);
     clearCode();
 
