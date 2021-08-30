@@ -1,7 +1,7 @@
 let c = document.getElementById("ahc-canvas");
 const WIDTH = c.width;
 const HEIGHT = c.height;
-const new_sym = -1;
+const nyt = "NYT";
 var global_tree;
 //simple queue implementation
 class QueueNode{
@@ -70,10 +70,11 @@ class Node{
 }
 class Tree{
     constructor(){
-        this.root = new Node(null, "NEW");
+        this.root = new Node(null, nyt);
         this.size = 1; //number of nodes in the tree
         this.weight_sum = 0; //sum of all weights
-        this.nodes = {"NEW": this.root}; //dictionary to track and find symbols which exist in tree
+        this.nodes = {}; //dictionary to track and find symbols which exist in tree
+        this.nodes[nyt] = this.root;
         this.fixed = {};
         this.orderedNodes = [];
         this.swapCount = 0;
@@ -90,96 +91,29 @@ class Tree{
             console.log("Error: tried to swap root");
             return;
         }
-        console.log("swapping: ", n1.symbol, n1.weight, "with: ", n2.symbol, n2.weight);
-        console.log("n1 parent: ", n1.parent, "n2 parent: ", n2.parent);
-        /*
-        if(n1.parent === n2){
-            //n2 is n1's parent
-            console.log("help");
-            this.parentSwap(n2, n1);
-            return;
-        }
-        else if(n2.parent === n1){
-            //n1 is n2's parent
-            console.log("me");
-            this.parentSwap(n1, n2);
-            return;
-        }
-        */
-        //Swapping one at a time can cause an error with this logic.
-        //Instead check both first, then swap both.
         var temp = n1;
-        var dir1, dir2;
         var p1 = n1.parent;
         var p2 = n2.parent;
         if(n1.parent.right === n1){
             n1.parent.right = n2;
-            dir1 = 'r';
         }
         else if(n1.parent.left === n1){
             n1.parent.left = n2;
-            dir1 = 'l';
         }
         else{
-            console.log("swap error");
+            console.log("swap error"); //This should be unreachable
         }
         if(n2.parent.right === n2){
             n2.parent.right = temp;
-            dir2 = 'r';
         }
         else if(n2.parent.left === n2){
             n2.parent.left = temp;
-            dir2 = 'l';
         }
         else{
             console.log("swap error");
         }
         n2.parent = p1;
         n1.parent = p2;
-        console.log("swapped");
-        console.log("n1 parent: ", n1.parent, "n2 parent: ", n2.parent);
-        /*
-        console.log(dir1, dir2);
-        n2.parent = p1;
-        n1.parent = p2;
-        if(dir1 === 'r'){
-            n1.parent.right = n1;
-        }
-        else{
-            n1.parent.left = n1;
-        }
-        if(dir2 === 'r'){
-            n2.parent.right = n2;
-        }
-        else{
-            n2.parent.left = n2;
-        }
-        */
-    }
-    parentSwap(parent, child){
-        /* var node= parent;
-        // Try to find a node to the left of the parent.
-        // If we can't, then move up n nodes to get to the root
-        // and go down n+1 nodes right of the root.
-        var levelAdded = 1;
-        var leftNode;
-        node = node.parent;
-        while(node !== this.root){
-            leftNode = node;
-            for(var i=0; i<levelAdded; i++){
-                if(!leftNode.left){
-                    break;
-                }
-                else{
-                    leftNode = 
-                }
-            }
-        } */
-        //The above method is messy, inefficient and prone to bugs.
-        // Instead: track the node order and add one to the index.
-        var parentIdx = this.orderedNodes.indexOf(parent);
-        this.swap(this.orderedNodes[parentIdx + 1], child);
-
     }
     getPath(node){
         var path = "";
@@ -195,7 +129,7 @@ class Tree{
     }
     encodeSymbol(c){
         if(this.nodes[c] === undefined){
-            return this.getPath(this.nodes["NEW"]) + this.fixed[c];
+            return this.getPath(this.nodes[nyt]) + this.fixed[c];
         }
         else{
             return this.getPath(this.nodes[c]);
@@ -222,14 +156,14 @@ class Tree{
     update(c){
         var node = this.nodes[c];
         if(node === undefined){ //if new char, add new node
-            node = this.nodes["NEW"];
-            node.left = new Node(node, "NEW");
+            node = this.nodes[nyt];
+            node.left = new Node(node, nyt);
             node.right = new Node(node, c);
             node.right.weight = 1; //set child weight to 1 since this is first appearance of c
             this.weight_sum++;
             this.size++;
             node.symbol = null;
-            this.nodes["NEW"] = node.left;
+            this.nodes[nyt] = node.left;
             this.nodes[c] = node.right;
         }
         // Add 1 to each node's weight at and above current node
@@ -244,10 +178,9 @@ class Tree{
         var done = false;
         while(!done){
             done = true; //If no out of order nodes are found, loop will end.
-            //var orderedNodes = [];
             var q = new Queue();
             
-            this.orderedNodes = [];
+            this.orderedNodes = []; // An array which tracks the reverse level-order nodes
             
             // top to bottom, right to left level order traversal:
             // put right, left node in queue, dequeue next node
@@ -263,7 +196,6 @@ class Tree{
                 if(node.left){
                     q.enqueue(node.left);
                 }
-                //prevNode = node;
             }
             // orderedNodes are in reverse level order, so weights should be monotonically non-increasing
             // Loop through level order tree and swap furthest two nodes (and set done to false) if necessary
@@ -276,9 +208,9 @@ class Tree{
                     if(n.weight < high.weight){
                         high = n;
                     }
-                    else if(n.weight > high.weight){
+                    else if(n.weight > high.weight){ //a swap will be required
                         low = n;
-                        done = false;
+                        done = false; //We will need to check the tree again
                     }
                 }
                 else{
@@ -286,8 +218,8 @@ class Tree{
                         low = n;
                     }
                     else{
-                        this.swap(low, high);
-                        this.recountWeights(this.root);
+                        this.swap(low, high); //swap low and high nodes.
+                        this.recountWeights(this.root); //get correct node weights
                         this.swapCount++;
                         if(this.swapCount>1000){
                             done = true;
@@ -368,15 +300,31 @@ $("#ahc-input").on("change keyup paste", function(){
     encodeStr(document.getElementById("ahc-input"));
 })
 
+function displayCode(code){
+    const p = document.getElementById("ahc-output");
+    if(p.innerHTML === ""){
+        p.innerHTML += code;
+    }
+    else{
+        p.innerHTML += " " + code;
+    }
+}
+function clearCode(){
+    const p = document.getElementById("ahc-output");
+    p.innerHTML = "";
+}
+
 function encodeStr(e){
     const str = e.value;
     nSym = 256;
     var tree = new Tree();
     global_tree = tree;
-    tree.init();
+    tree.init(nSym);
+    clearCode();
 
     for(ch of str){
         var code = tree.encodeSymbol(ch);
+        displayCode(code);
         tree.update(ch);
     }
     tree.clear();
@@ -384,7 +332,7 @@ function encodeStr(e){
     
 }
 
-
+//This is a test function that is no longer necessary
 function encodingTest(){
     //const str = "AABCDAD";
     const str = "aardvark";
@@ -400,4 +348,8 @@ function encodingTest(){
     //tree.print();
     tree.clear();
     tree.draw(tree.root, WIDTH/2, 50, WIDTH/2);
+}
+function auto_height(elem) {
+    elem.style.height = "1px";
+    elem.style.height = (elem.scrollHeight)+"px";
 }

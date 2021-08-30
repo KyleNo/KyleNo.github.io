@@ -709,3 +709,25 @@ sup{
     display: block;
     margin: auto;
 }
+.ahc-row{
+    display: flex;
+    justify-content: center;
+    /*max-width: 800px;*/
+    margin: auto;
+    padding: 0;
+    width: 90%;
+}
+.ahc-input-col{
+    flex-basis: 40%;
+    padding: 5px;
+}
+.ahc-output-col{
+    flex-basis: 50%;
+    padding: 5px;
+}
+.ahc-code{
+    display: block;
+    margin: auto;
+    text-align: center;
+    max-width: 500px;
+}
