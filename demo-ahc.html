@@ -47,7 +47,7 @@
                     technique is that both the encoder and decoder need to have the information about the symbol
                     frequencies to generate the same prefix codes. Such a method cannot be used effectively in
                     scenarios where the whole data set is not known in advance.
-                    <br />
+                    <br /><br />
                     To address this, a technique called adaptive Huffman coding was created. Rather than using
                     known frequency information to generate a static tree, the tree is updated after each character
                     is encoded/decoded. The dynamic nature of this variation on Huffman coding is suitable for
@@ -69,7 +69,7 @@
                     where the left child is the new location of the NYT symbol and the right child is the node for
                     the new symbol. The weight of the leaf nodes is the number of times that symbol has been seen.
                     The weights of non-leaf nodes are the sums of their child nodes' weights.
-                    <br />
+                    <br /><br />
                     Once the weights of each node are updated, the encoder must check whether the sibling property
                     of the tree has been violated. The sibling property is that each node of the tree has
                     monotonically non-decreasing weights when read left to right, bottom to top. If there is a
