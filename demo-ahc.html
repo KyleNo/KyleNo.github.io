@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <base href=".">
+        <meta name="viewport" content="with=device-width, initial-scale=1.0" charset="UTF-8">
+        <title>Adaptive Huffman Coding</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=MonteCarlo&display=swap" rel="stylesheet">
+        <script src="https://kit.fontawesome.com/6d6b6b0664.js" crossorigin="anonymous"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    </head>
+    <body onload="encodeStr(document.getElementById('ahc-input'))">
+        <section class="small-demo-header">
+            <nav>
+                <a href="index.html">Kyle Noble</a>
+                <div class="nav-links" id="navLinks">
+                    <i class="far fa-times-circle" onclick="hideMenu()"></i>
+                    <ul>
+                        <li><a href="index.html">Home</a></li>
+                        <li><a href="projects.html">Projects</a></li>
+                        <li><a href="demos.html">Demos</a></li>
+                        <li><a href="about.html">About Me</a></li>
+                    </ul>
+                </div>
+                <i class="fas fa-bars" onclick="showMenu()"></i>
+            </nav>
+            <div class="sub-text">
+                <h1>Adaptive Huffman Coding</h1>
+            </div>
+        </section>
+        
+        <section>
+            <div class="demo-expl">
+                <h3>History</h3>
+                <p>David Albert Huffman is a well known computer scientist who notably developed
+                    the lossless compression technique named Huffman coding. <a href="https://www.huffmancoding.com/my-uncle/scientific-american">Reportedly</a>, Huffman created this
+                    coding method to avoid taking a final exam on information theory. This technique utilizes
+                    frequency information known about the data to create prefix codes for each symbol,
+                    where the more frequently used symbols have shorter codes, while the seldom used characters
+                    have longer codes. The way that these codes are generated is by creating a binary tree in a
+                    specific manner such that each symbol is located at a leaf node in the tree and higher frequency
+                    symbols have shorter paths to the root of the tree. Zero is assigned to left side branches while
+                    one is assigned to right side branches. The prefix codes can then be determined by recording the
+                    ones and zeroes seen while traversing from the root to a particular node. The downside to this
+                    technique is that both the encoder and decoder need to have the information about the symbol
+                    frequencies to generate the same prefix codes. Such a method cannot be used effectively in
+                    scenarios where the whole data set is not known in advance.
+                    <br />
+                    To address this, a technique called adaptive Huffman coding was created. Rather than using
+                    known frequency information to generate a static tree, the tree is updated after each character
+                    is encoded/decoded. The dynamic nature of this variation on Huffman coding is suitable for
+                    networking applications, but suffers from sensitivity to bit errors. Although adaptive Huffman
+                    coding may not be very popular, some form of Huffman coding is used in a variety of
+                    compression applications including GZIP, PKZIP, JPEG, and MPEG.
+                </p>
+                <h3>FGK Algorithm</h3>
+                <p>Adaptive Huffman coding has two main algorithms: FGK (Faller-Gallager-Knuth) and Vitter. The Vitter
+                    algorithm is an improvement on the FGK algorithm. This demo uses FGK, so it will be focused on.
+                    First, a binary tree is initialized. Each node on this tree should hold a weight and optionally
+                    a symbol. Only leaf nodes should contain symbols. The root of the tree should initially have a
+                    node with a Not-Yet-Transferred (NYT) symbol and a weight of zero (also called the zero node).
+                    The weight of this node should never increase. When a symbol that has not yet been transferred
+                    is sent, the encoder finds sends the code for the NYT symbol and then a fixed length code for
+                    the symbol. The code for any symbol on the tree is obtained by traversing the path from the root
+                    to the symbol's node, where left side branches are represented by '0' and right side branches are
+                    represented by '1.' After a new symbol is sent, the node that the NYT symbol spawns two child nodes
+                    where the left child is the new location of the NYT symbol and the right child is the node for
+                    the new symbol. The weight of the leaf nodes is the number of times that symbol has been seen.
+                    The weights of non-leaf nodes are the sums of their child nodes' weights.
+                    <br />
+                    Once the weights of each node are updated, the encoder must check whether the sibling property
+                    of the tree has been violated. The sibling property is that each node of the tree has
+                    monotonically non-decreasing weights when read left to right, bottom to top. If there is a
+                    violation of this property, the node whose update violated the property is swapped with the furthest
+                    node with weight one less than the other node. Multiple swaps may need to occur before the
+                    sibling property is restored.
+                </p>
+                <h3>About this Demo</h3>
+                <p>To use this demo, type a string of text into the input box. As you type, the tree will adjust
+                    itself and the corresponding output symbols will be shown in the output box. It is best to
+                    use this application on a display that is at least 1920x1080. Note that the more you use a
+                    character, the shorter the output code tends to be.
+                </p>
+            </div>
+            <div class="ahc-code">
+                <h3>Pseudocode</h3>
+<pre class="pseudocode"><code>initialize tree
+assign fixed length codes to symbols
+for each char in str:
+    if char NYT:
+        output NYT code + fixed length char code
+        split NYT node into NYT node on left child
+            and char node on right child
+        node = right child
+    else:
+        output char code
+        node = char node
+    node.weight++
+    while node is not root:
+        node = node.parent
+        node.weight++
+    adjust tree if necessary to maintain sibling property
+</code></pre>
+            </div>
+        </section>
+        
+        <section class="demo-ahc" style="text-align: center;">
+            <div class="ahc-row">
+                <div class="ahc-input-col">
+                    <h3>Live input</h3>
+                    <textarea rows="1" class="auto_height" oninput="auto_height(this)" id="ahc-input" spellcheck="false"></textarea>
+                </div>
+                <div class="ahc-output-col">
+                    <h3>Output bitstream</h3>
+                    <p id="ahc-output" style="border: 1px solid #DDD; text-align: justify;"></p>
+                </div>
+            </div>
+            <canvas id="ahc-canvas" width="1900" height="800"></canvas>
+
+            
+        </section>
+
+        
+
+        
+        
+        <!---  Footer  --->
+        
+        <section class="footer">
+            <h4>Contact</h4>
+            <p>Contact information can be found linked below.</p>
+            <div class="demo-icons">
+                <a href="https://www.linkedin.com/in/kyle-n-noble/"><i class="fab fa-linkedin-in"></i></a>
+                <a href="https://github.com/KyleNo"><i class="fab fa-github"></i></a>
+            </div>
+            <p>Website created by Kyle Noble.</p>
+        </section>
+        
+        <!--- JavaScript for Mobile Menu Toggle --->
+        <script>
+            var navLinks = document.getElementById("navLinks");
+            
+            function showMenu(){
+                navLinks.style.right = "0";
+            }
+            function hideMenu(){
+                navLinks.style.right = "-200px";
+            }
+        </script>
+        <script src="scripts/ahc.js"></script>
+    </body>
+</html>
