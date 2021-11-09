@@ -36,6 +36,21 @@
         <!--- Projects --->
         <article>
         <section class=pro-posts>
+            <a id="discord">
+                <section class="pro-post">
+                    <h2 slot='discord'>Discord Music Bot</h2>
+                    <p>Discord is a popular online communication platform with text and voice chat features. One reason for Discord's popularity is its extensive support for developers, including streamlined application creation wizards, clearly communicated permissions, and a simple API with detailed documentation. A popular Discord application is a music bot which can stream the audio from any public Youtube video into the user's voice channel. This allows for people to be able to listen to music together while having a conversation. Unfortunately, some of the larger music bots which operated on freemium models have been issued cease and desist orders for modifying Youtube's service for commercial use. This inspired me to create my own Discord music bot just for Discord servers that I'm in.
+                    </p>
+                    <figure>
+                        <img src="images/musicbotupscaled.png" alt="Swiper Bot">
+                        <figcaption>Upscaled screenshot of music bot</figcaption>
+                    </figure>
+                    <p>I wrote this music bot in Python using a Python API wrapper from Github user <a href="https://github.com/Rapptz/discord.py">Rapptz</a> called <a href="https://discordpy.readthedocs.io/en/stable/">discord.py</a>. The bot is capable of enqueuing youtube videos either through search terms or direct link, allows for entire playlists to be enqueued in one command, has standard stop, pause, and resume commands, and supports skipping songs, viewing what songs are left in the queue, removing songs from the queue, and shuffling either the whole queue or a contiguous subsection of the queue. The bot works by waiting for a command to be given in one of the text channels then parses the command and its arguments to determine which operation to perform. Music is played through ffmpeg using the Discord API. Each server's music queue is a custom queue implementation which allows for extra functionality. The source code for this bot can be found on my <a href="https://github.com/KyleNo/SwiperBot">Github profile</a>.
+                    </p>
+                    <p>I am still occasionally updating this bot and adding features. In the future I plan on adding non-music functionality. It is currently running on an AWS EC2 instance, but I have not made the invite link public.
+                    </p>
+                </section>
+            </a>
             <a id="qi">
                 <section class="pro-post">
                     <h2 slot='qi'>Qi Wireless Charger</h2>
